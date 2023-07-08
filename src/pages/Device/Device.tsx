@@ -10,6 +10,7 @@ import {
   Row,
   Select,
   Table,
+  Tooltip,
 } from "antd";
 import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
@@ -18,6 +19,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { SearchOutlined } from "@ant-design/icons";
 import { BookWithId, fetchBooks } from "../../features/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
+import "../Device/Device.css";
+const MAX_DISPLAY_ITEMS = 2; //Xác định số lượng mục tối đa để hiển thị
 
 const Device: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,16 +29,19 @@ const Device: React.FC = () => {
   );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  const [selectedBook, setSelectedBook] = useState<BookWithId | null>(null);
+  const [selected, setSelected] = useState<BookWithId | null>(null);
+  //hiển thị bảng dữ liệu
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
+  //hành động nút tìm kiếm
   const handleSearch = (value: string) => {
     setSearchTerm(value);
   };
-  const [selectedBook, setSelectedBook] = useState<BookWithId | null>(null);
-  const [selected, setSelected] = useState<BookWithId | null>(null);
+
+  //hành động nút edit
   const handleEditIcon = (book: BookWithId) => {
     setSelectedBook(book);
   };
@@ -47,6 +53,8 @@ const Device: React.FC = () => {
       navigate(`/edit-device/${selectedBook.id}`);
     }
   }, [selectedBook, navigate]);
+
+  //hành động nút read
   const handleReadIcon = (book: BookWithId) => {
     setSelected(book);
     navigate(`/read-book/${book.id}`);
@@ -56,6 +64,8 @@ const Device: React.FC = () => {
       navigate(`/read-book/${selected.id}`);
     }
   }, [selected, navigate]);
+
+  //cột trong bảng
   const columns = [
     {
       title: "Mã thiết bị",
@@ -76,6 +86,23 @@ const Device: React.FC = () => {
       title: "Dịch vụ sử dụng",
       dataIndex: ["book", "dvsd"],
       key: "author",
+      render: (text: any) => (
+        <Tooltip
+          title={
+            Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS
+              ? text.join(", ")
+              : ""
+          }
+        >
+          {Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS ? (
+            <span>
+              {text.slice(0, MAX_DISPLAY_ITEMS).join(", ")} <a>Xem thêm...</a>
+            </span>
+          ) : (
+            text
+          )}
+        </Tooltip>
+      ),
     },
     {
       key: "action",
@@ -199,13 +226,11 @@ const Device: React.FC = () => {
             <Col span={22}>
               <div className="view-books">
                 {filteredData?.length > 0 ? (
-                  <div className="container">
-                    <Table
-                      columns={columns}
-                      dataSource={filteredData}
-                      rowKey={(record) => record.id}
-                    />
-                  </div>
+                  <Table
+                    columns={columns}
+                    dataSource={filteredData}
+                    scroll={{ x: "max-content" }}
+                  />
                 ) : (
                   <div>There are no books matching your search!</div>
                 )}

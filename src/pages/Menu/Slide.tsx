@@ -11,9 +11,11 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import MenuItem from "../../model/menuItem";
+import "../Menu/Slide.css";
 
 import Home from "../Home/Home";
 import Device from "../Device/Device";
+import Service from "../services/Service";
 
 const { Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -90,16 +92,21 @@ interface SlideProps {
 
 const Slide: FC<SlideProps> = ({ handleLogout }) => {
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "130vh" }}>
       <Sider theme="light" className="sidebar">
-        <Menu mode="vertical" theme="light">
+        <Menu mode="vertical" theme="light" className="custom-menu">
           <Image
             width={200}
             src={`${process.env.PUBLIC_URL}/asset/logo-menu.png`}
           />
           {items.map((item) =>
             item.children ? (
-              <SubMenu key={item.key} icon={item.icon} title={item.label}>
+              <SubMenu
+                key={item.key}
+                icon={item.icon}
+                title={item.label}
+                className="custom-submenu"
+              >
                 {item.children.map((child) => (
                   <Menu.Item key={child.key}>
                     <Link to={child.path}>{child.label}</Link>
@@ -126,8 +133,8 @@ const Slide: FC<SlideProps> = ({ handleLogout }) => {
         <Routes>
           <Route path={DASHBOARD_ITEM.path} element={<Home />} />
           <Route path={DEVICE_ITEM.path} element={<Device />} />
-          {/* <Route path={SERVICE_ITEM.path} element={<Service />} />
-          <Route path={NUMBER_ITEM.path} element={<Number />} />
+          <Route path={SERVICE_ITEM.path} element={<Service />} />
+          {/* <Route path={NUMBER_ITEM.path} element={<Number />} />
           <Route path={REPORT_ITEM.path} element={<Report />} />
           <Route path={SETTINGS_ITEM.path} element={<Role />} />
           <Route path={SETTINGS_ITEM.children![0].path} element={<Role />} />

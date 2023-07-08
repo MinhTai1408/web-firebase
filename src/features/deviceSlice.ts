@@ -17,7 +17,7 @@ export interface Book {
   tenDn: string;
   diaChi: string;
   matKhau: string;
-  dvsd: string;
+  dvsd: string[];
 }
 
 export interface BookWithId {
