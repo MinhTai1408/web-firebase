@@ -1,80 +1,45 @@
-import { Col, Form, Input, Layout, Row, Select } from "antd";
-import Sider from "antd/es/layout/Sider";
-import React, { useReducer } from "react";
-import Menu from "../pages/Menu/Menu";
-import { Content, Header } from "antd/es/layout/layout";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Form, Input, Button, Select, Layout, Row, Col, Space } from "antd";
 import { useAppDispatch } from "../hooks/storeHook";
 import { addBookToFirestore } from "../features/deviceSlice";
 import { toast } from "react-toastify";
-interface AddState {
-  maTb: string;
-  loaiTb: string;
-  tenTb: string;
-  tenDn: string;
-  diaChi: string;
-  matKhau: string;
-  dvsd: string;
-}
-type AddAction =
-  | { type: "SET_MATB"; payload: string }
-  | { type: "SET_LOAITB"; payload: string }
-  | { type: "SET_TENTB"; payload: string }
-  | { type: "SET_TENDN"; payload: string }
-  | { type: "SET_DIACHI"; payload: string }
-  | { type: "SET_MATKHAU"; payload: string }
-  | { type: "SET_DVSD"; payload: string }
-  | { type: "CLEAR_FORM" };
+import Sider from "antd/es/layout/Sider";
+import Menu from "../pages/Menu/Menu";
+import { Content, Header } from "antd/es/layout/layout";
 
-const initialState: AddState = {
-  maTb: "",
-  loaiTb: "",
-  tenTb: "",
-  tenDn: "",
-  diaChi: "",
-  matKhau: "",
-  dvsd: "",
-};
+const { Option } = Select;
 
-function addReducer(state: AddState, action: AddAction): AddState {
-  switch (action.type) {
-    case "SET_MATB":
-      return { ...state, maTb: action.payload };
-    case "SET_LOAITB":
-      return { ...state, loaiTb: action.payload };
-    case "SET_TENTB":
-      return { ...state, tenTb: action.payload };
-    case "SET_TENDN":
-      return { ...state, tenDn: action.payload };
-    case "SET_DIACHI":
-      return { ...state, diaChi: action.payload };
-    case "SET_MATKHAU":
-      return { ...state, matKhau: action.payload };
-    case "SET_DVSD":
-      return { ...state, dvsd: action.payload };
-
-    default:
-      return state;
-  }
-}
-const AddDevices: React.FC = () => {
+const AddDevice: React.FC = () => {
+  const [size] = useState(12);
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
-  const [state, dispatchAdd] = useReducer(addReducer, initialState);
-  const handleAddBook = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    let book = {
-      maTb: state.maTb,
-      loaiTb: state.loaiTb,
-      tenTb: state.tenTb,
-      tenDn: state.tenDn,
-      diaChi: state.diaChi,
-      matKhau: state.matKhau,
-      dvsd: state.dvsd,
-    };
+  const navigate = useNavigate();
 
-    dispatch(addBookToFirestore(book));
-    toast.success("Add success");
+  const handleAddBook = async () => {
+    try {
+      const values = await form.validateFields();
+      setLoading(true);
+      let book = {
+        maTb: values.maTb,
+        loaiTb: values.loaiTb,
+        tenTb: values.tenTb,
+        tenDn: values.tenDn,
+        diaChi: values.diaChi,
+        matKhau: values.matKhau,
+        dvsd: values.dvsd,
+      };
+      dispatch(addBookToFirestore(book)).then(() => {
+        setLoading(false);
+        toast.success("Add success");
+        navigate("/device");
+      });
+    } catch (error) {
+      console.log("Validation failed:", error);
+    }
   };
+
   return (
     <div>
       <Layout>
@@ -95,13 +60,19 @@ const AddDevices: React.FC = () => {
                 <Link to="/device" style={{ color: "black", left: 5 }}>
                   Danh sách thiết bị &gt;
                 </Link>
-                <Link to="/add-device" style={{ color: "orange", left: 5 }}>
+                <Link to="#" style={{ color: "orange", left: 5 }}>
                   Thêm thiết bị
                 </Link>
               </p>
             </div>
           </Header>
-          <Content style={{ margin: "24px 16px 0" }}>
+          <Content
+            style={{
+              margin: "24px 16px 0",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <p
               style={{
                 fontSize: 25,
@@ -124,123 +95,134 @@ const AddDevices: React.FC = () => {
               >
                 Thêm thiết bị
               </p>
-              <form onSubmit={handleAddBook}>
+              <Form
+                layout="vertical"
+                form={form}
+                onFinish={handleAddBook}
+                style={{ marginLeft: 15, marginRight: 15 }}
+              >
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Form.Item label="Mã thiết bị">
-                      <Input
-                        placeholder="input placeholder"
-                        required
-                        onChange={(e) =>
-                          dispatchAdd({
-                            type: "SET_MATB",
-                            payload: e.target.value,
-                          })
-                        }
-                        value={state.maTb}
-                      />
+                    <Form.Item
+                      label="Mã thiết bị"
+                      name="maTb"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập mã thiết bị!",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Tên thiết bị"
+                      name="tenTb"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập tên thiết bị!",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Địa chỉ"
+                      name="diaChi"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập địa chỉ!",
+                        },
+                      ]}
+                    >
+                      <Input />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item label="Loại thiết bị">
-                      <Select
-                        placeholder="Select a course type"
-                        onChange={(value) =>
-                          dispatchAdd({ type: "SET_LOAITB", payload: value })
-                        }
-                        value={state.loaiTb}
-                      >
-                        <Select.Option value="hard">Hard</Select.Option>
-                        <Select.Option value="medium">Medium</Select.Option>
-                        <Select.Option value="easy">Easy</Select.Option>
+                    <Form.Item
+                      label="Loại thiết bị"
+                      name="loaiTb"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng chọn loại thiết bị!",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="Chọn loại thiết bị">
+                        <Option value="hard">Hard</Option>
+                        <Option value="medium">Medium</Option>
+                        <Option value="soft">Soft</Option>
                       </Select>
                     </Form.Item>
-                  </Col>
-                </Row>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item label="Tên thiết bị">
-                      <Input
-                        placeholder="input placeholder"
-                        required
-                        onChange={(e) =>
-                          dispatchAdd({
-                            type: "SET_TENTB",
-                            payload: e.target.value,
-                          })
-                        }
-                        value={state.tenTb}
-                      />
+
+                    <Form.Item
+                      label="Tên đơn vị sử dụng"
+                      name="tenDn"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập tên đơn vị sử dụng!",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Mật khẩu"
+                      name="matKhau"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập mật khẩu!",
+                        },
+                      ]}
+                    >
+                      <Input.Password />
                     </Form.Item>
                   </Col>
-                  <Col span={12}>
-                    <Form.Item label="Tên đăng nhập">
-                      <Input
-                        placeholder="input placeholder"
-                        required
-                        onChange={(e) =>
-                          dispatchAdd({
-                            type: "SET_TENDN",
-                            payload: e.target.value,
-                          })
-                        }
-                        value={state.tenDn}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item label="Địa chỉ">
-                      <Input
-                        placeholder="input placeholder"
-                        required
-                        onChange={(e) =>
-                          dispatchAdd({
-                            type: "SET_DIACHI",
-                            payload: e.target.value,
-                          })
-                        }
-                        value={state.diaChi}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="Mật khẩu">
-                      <Input
-                        placeholder="input placeholder"
-                        required
-                        onChange={(e) =>
-                          dispatchAdd({
-                            type: "SET_MATKHAU",
-                            payload: e.target.value,
-                          })
-                        }
-                        value={state.matKhau}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row>
                   <Col span={24}>
-                    <Form.Item label="Dịch vụ sử dụng">
-                      <Input
-                        placeholder="input placeholder"
-                        required
-                        onChange={(e) =>
-                          dispatchAdd({
-                            type: "SET_DVSD",
-                            payload: e.target.value,
-                          })
-                        }
-                        value={state.dvsd}
-                      />
+                    <Form.Item
+                      label="Đơn vị sử dụng"
+                      name="dvsd"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập đơn vị sử dụng!",
+                        },
+                      ]}
+                    >
+                      <Input />
                     </Form.Item>
                   </Col>
                 </Row>
-                <button type="submit">Add</button>
-              </form>
+              </Form>
             </Content>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 20,
+              }}
+            >
+              <Space size={size}>
+                <Button style={{ backgroundColor: " white", color: "#FF9138" }}>
+                  <Link to="/device">Hủy</Link>
+                </Button>
+                <Button
+                  type="primary"
+                  onClick={handleAddBook}
+                  loading={loading}
+                >
+                  Lưu
+                </Button>
+              </Space>
+            </div>
           </Content>
         </Layout>
       </Layout>
@@ -248,4 +230,4 @@ const AddDevices: React.FC = () => {
   );
 };
 
-export default AddDevices;
+export default AddDevice;

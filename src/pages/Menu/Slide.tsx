@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { Link, Route, Routes } from "react-router-dom";
-import { Button, Layout, Menu } from "antd";
+import { Button, Layout, Menu, Image } from "antd";
 import {
   AppstoreOutlined,
   AreaChartOutlined,
@@ -13,7 +13,7 @@ import {
 import MenuItem from "../../model/menuItem";
 
 import Home from "../Home/Home";
-import List from "../Device";
+import Device from "../Device/Device";
 
 const { Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -91,8 +91,12 @@ interface SlideProps {
 const Slide: FC<SlideProps> = ({ handleLogout }) => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sider theme="light" className="sidebar" style={{}}>
+      <Sider theme="light" className="sidebar">
         <Menu mode="vertical" theme="light">
+          <Image
+            width={200}
+            src={`${process.env.PUBLIC_URL}/asset/logo-menu.png`}
+          />
           {items.map((item) =>
             item.children ? (
               <SubMenu key={item.key} icon={item.icon} title={item.label}>
@@ -121,7 +125,7 @@ const Slide: FC<SlideProps> = ({ handleLogout }) => {
       <Content>
         <Routes>
           <Route path={DASHBOARD_ITEM.path} element={<Home />} />
-          <Route path={DEVICE_ITEM.path} element={<List />} />
+          <Route path={DEVICE_ITEM.path} element={<Device />} />
           {/* <Route path={SERVICE_ITEM.path} element={<Service />} />
           <Route path={NUMBER_ITEM.path} element={<Number />} />
           <Route path={REPORT_ITEM.path} element={<Report />} />

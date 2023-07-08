@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, Col, Form, Input, Layout, Row, Select, Table } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  Layout,
+  Row,
+  Select,
+  Table,
+} from "antd";
 import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
@@ -9,12 +19,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { BookWithId, fetchBooks } from "../../features/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 
-interface DeviceProps {
-  handleEditIcon: (book: BookWithId) => void;
-  bookToEdit: BookWithId | null;
-}
-
-const Device: React.FC<DeviceProps> = ({ handleEditIcon }) => {
+const Device: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const data: BookWithId[] | undefined = useAppSelector(
     (state) => state.books.booksArray
@@ -26,23 +31,31 @@ const Device: React.FC<DeviceProps> = ({ handleEditIcon }) => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  const handleEdit = (book: BookWithId) => {
-    handleEditIcon(book);
-    navigate(`/edit/${book.id}`);
-  };
-
-  const handleRead = (book: BookWithId) => {
-    navigate(`/book/${book.id}`);
-  };
-
   const handleSearch = (value: string) => {
     setSearchTerm(value);
   };
-
+  const [selectedBook, setSelectedBook] = useState<BookWithId | null>(null);
+  const [selected, setSelected] = useState<BookWithId | null>(null);
+  const handleEditIcon = (book: BookWithId) => {
+    setSelectedBook(book);
+  };
   const filteredData = data?.filter((book) =>
     book.book?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  useEffect(() => {
+    if (selectedBook) {
+      navigate(`/edit-device/${selectedBook.id}`);
+    }
+  }, [selectedBook, navigate]);
+  const handleReadIcon = (book: BookWithId) => {
+    setSelected(book);
+    navigate(`/read-book/${book.id}`);
+  };
+  useEffect(() => {
+    if (selected) {
+      navigate(`/read-book/${selected.id}`);
+    }
+  }, [selected, navigate]);
   const columns = [
     {
       title: "Mã thiết bị",
@@ -65,20 +78,12 @@ const Device: React.FC<DeviceProps> = ({ handleEditIcon }) => {
       key: "author",
     },
     {
-      render: (text: string, record: BookWithId) => (
-        <Row gutter={18}>
-          <Col span={9}>
-            <div onClick={() => handleRead(record)}>
-              <Link to="#">Chi tiết</Link>
-            </div>
-          </Col>
-
-          <Col span={9}>
-            <div onClick={() => handleEdit(record)}>
-              <Link to="#">Cập nhật</Link>
-            </div>
-          </Col>
-        </Row>
+      key: "action",
+      render: (record: BookWithId) => (
+        <>
+          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
+          <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
+        </>
       ),
     },
   ];

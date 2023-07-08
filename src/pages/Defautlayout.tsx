@@ -8,8 +8,11 @@ import Home from "./Home/Home";
 
 import AuthRoutes from "../components/AuthAction";
 
-import List from "./Device";
 import AddDevices from "../components/AddDevices";
+
+import Edit from "../components/EditDevice";
+import Device from "./Device/Device";
+import ReadDevice from "../components/ReadDevice";
 
 const Defautlayout = () => {
   return (
@@ -19,8 +22,10 @@ const Defautlayout = () => {
         <Route path="/forgotnew" element={<ForgotPasswordNew />} />
         <Route element={<AuthRoutes />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/device" element={<List />} />
+          <Route path="/device" element={<Device />} />
           <Route path="/add-device" element={<AddDevices />} />
+          <Route path="/edit-device/:id" element={<Edit />} />
+          <Route path="/read-book/:id" element={<ReadDevice />} />
         </Route>
       </Routes>
     </div>
