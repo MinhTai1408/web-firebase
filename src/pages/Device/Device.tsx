@@ -108,8 +108,15 @@ const Device: React.FC = () => {
       key: "action",
       render: (record: BookWithId) => (
         <>
-          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
           <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
+        </>
+      ),
+    },
+    {
+      key: "action",
+      render: (record: BookWithId) => (
+        <>
+          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
         </>
       ),
     },

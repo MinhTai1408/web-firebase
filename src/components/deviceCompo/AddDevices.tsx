@@ -59,7 +59,7 @@ const AddDevice: React.FC = () => {
     }
   };
 
-  const handleServiceChange = (value: string[]) => {
+  const handleDeviceChange = (value: string[]) => {
     setDeviceData((prevDeviceData) => {
       return {
         ...prevDeviceData,
@@ -227,7 +227,7 @@ const AddDevice: React.FC = () => {
                         mode="multiple"
                         allowClear
                         placeholder="Please select"
-                        onChange={handleServiceChange}
+                        onChange={handleDeviceChange}
                       >
                         <Select.Option value="Khám tim mạch">
                           Khám tim mạch

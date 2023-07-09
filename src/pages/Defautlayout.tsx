@@ -14,6 +14,7 @@ import Edit from "../components/deviceCompo/EditDevice";
 import Device from "./Device/Device";
 import ReadDevice from "../components/deviceCompo/ReadDevice";
 import Service from "./services/Service";
+import AddService from "../components/serviceCompo/AddService";
 
 const Defautlayout = () => {
   return (
@@ -28,6 +29,7 @@ const Defautlayout = () => {
           <Route path="/edit-device/:id" element={<Edit />} />
           <Route path="/read-book/:id" element={<ReadDevice />} />
           <Route path="/service" element={<Service />} />
+          <Route path="/add-service" element={<AddService />} />
         </Route>
       </Routes>
     </div>

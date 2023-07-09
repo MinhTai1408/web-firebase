@@ -34,9 +34,13 @@ const Service: React.FC = () => {
   useEffect(() => {
     dispatch(fetchService());
   }, [dispatch]);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+  };
   const filteredData = data?.filter((service) =>
-  service.service?.tenDv?.toLowerCase().includes(searchTerm.toLowerCase())
-);
+    service.service?.tenDv?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   const columns = [
     {
       title: "Mã dịch vụ",
@@ -57,8 +61,15 @@ const Service: React.FC = () => {
       key: "action",
       render: (record: ServiceWithId) => (
         <>
-          <Button >Cập nhật</Button>
-          <Button >Đọc</Button>
+          <Button>Đọc</Button>
+        </>
+      ),
+    },
+    {
+      key: "action",
+      render: (record: ServiceWithId) => (
+        <>
+          <Button>Cập nhật</Button>
         </>
       ),
     },
@@ -145,32 +156,32 @@ const Service: React.FC = () => {
                 <Input
                   placeholder="Nhập từ khóa"
                   prefix={<SearchOutlined style={{ color: "orange" }} />}
-                  //onChange={(e) => handleSearch(e.target.value)}
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </Col>
             </Row>
             <Row style={{ paddingTop: 20 }}>
-            <Col span={22}>
-              <div className="view-books">
-                {filteredData?.length > 0 ? (
-                  <Table
-                    columns={columns}
-                    dataSource={filteredData}
-                    scroll={{ x: "max-content" }}
-                  />
-                ) : (
-                  <div>There are no books matching your search!</div>
-                )}
-              </div>
-            </Col>
-            <Col span={2} style={{ left: 10 }}>
-              <Link to={"#"}>
-                <Card style={{ backgroundColor: "#FFF2E7" }}>
-                  <p>Thêm thiết bị</p>
-                </Card>
-              </Link>
-            </Col>
-          </Row>
+              <Col span={22}>
+                <div className="view-books">
+                  {filteredData?.length > 0 ? (
+                    <Table
+                      columns={columns}
+                      dataSource={filteredData}
+                      scroll={{ x: "max-content" }}
+                    />
+                  ) : (
+                    <div>There are no books matching your search!</div>
+                  )}
+                </div>
+              </Col>
+              <Col span={2} style={{ left: 10 }}>
+                <Link to={"/add-service"}>
+                  <Card style={{ backgroundColor: "#FFF2E7" }}>
+                    <p>Thêm thiết bị</p>
+                  </Card>
+                </Link>
+              </Col>
+            </Row>
           </Content>
         </Layout>
       </Layout>
