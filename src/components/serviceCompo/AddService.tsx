@@ -14,7 +14,7 @@ type ServiceData = {
   maDv: string;
   tenDv: string;
   moTa: string;
-  number: CheckboxValueType[];
+  text: CheckboxValueType[];
 };
 
 const AddService: React.FC = () => {
@@ -25,7 +25,7 @@ const AddService: React.FC = () => {
     maDv: "",
     tenDv: "",
     moTa: "",
-    number: [],
+    text: [],
   });
 
   const dispatch = useAppDispatch();
@@ -38,7 +38,7 @@ const AddService: React.FC = () => {
         maDv: values.maDv,
         tenDv: values.tenDv,
         moTa: values.moTa,
-        number: serviceData.number,
+        text: serviceData.text,
       };
       dispatch(addServiceToFirestore(service)).then(() => {
         setLoading(false);
@@ -53,7 +53,7 @@ const AddService: React.FC = () => {
     setServiceData((prevDeviceData) => {
       return {
         ...prevDeviceData,
-        number: value,
+        text: value,
       };
     });
   };

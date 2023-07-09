@@ -10,11 +10,12 @@ import AuthRoutes from "../components/deviceCompo/AuthAction";
 
 import AddDevices from "../components/deviceCompo/AddDevices";
 
-import Edit from "../components/deviceCompo/EditDevice";
 import Device from "./Device/Device";
 import ReadDevice from "../components/deviceCompo/ReadDevice";
 import Service from "./services/Service";
 import AddService from "../components/serviceCompo/AddService";
+import EditService from "./../components/serviceCompo/EditService";
+import EditDevice from "../components/deviceCompo/EditDevice";
 
 const Defautlayout = () => {
   return (
@@ -26,10 +27,11 @@ const Defautlayout = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/device" element={<Device />} />
           <Route path="/add-device" element={<AddDevices />} />
-          <Route path="/edit-device/:id" element={<Edit />} />
+          <Route path="/edit-device/:id" element={<EditDevice />} />
           <Route path="/read-book/:id" element={<ReadDevice />} />
           <Route path="/service" element={<Service />} />
           <Route path="/add-service" element={<AddService />} />
+          <Route path="/edit-service/:id" element={<EditService />} />
         </Route>
       </Routes>
     </div>

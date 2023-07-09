@@ -47,6 +47,18 @@ export const fetchService = createAsyncThunk<ServiceWithId[]>(
   }
 );
 
+export const updateService = createAsyncThunk<ServiceWithId, ServiceWithId>(
+  "services/updateService",
+  async (editedBook) => {
+    if (!editedBook.service) {
+      throw new Error("Invalid book data");
+    }
+    const serviceRef = doc(db, "Service", editedBook.id);
+    await updateDoc(serviceRef, editedBook.service as Partial<Service>);
+    return editedBook;
+  }
+);
+
 const serviceSlice = createSlice({
   name: "Service",
   initialState: {
@@ -60,6 +72,15 @@ const serviceSlice = createSlice({
       })
       .addCase(addServiceToFirestore.fulfilled, (state, action) => {
         state.serviceArray.push(action.payload);
+      })
+      .addCase(updateService.fulfilled, (state, action) => {
+        const { id, service } = action.payload;
+        const serviceIndex = state.serviceArray.findIndex(
+          (service) => service.id === id
+        );
+        if (serviceIndex !== -1) {
+          state.serviceArray[serviceIndex] = { id: id, service };
+        }
       });
   },
 });

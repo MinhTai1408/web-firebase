@@ -25,6 +25,9 @@ const Service: React.FC = () => {
   const data: ServiceWithId[] | undefined = useAppSelector(
     (state) => state.service.serviceArray
   );
+  const [selectedService, setSelectedService] = useState<ServiceWithId | null>(
+    null
+  );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const onChange: DatePickerProps["onChange"] = (date, dateString) => {
@@ -38,9 +41,18 @@ const Service: React.FC = () => {
   const handleSearch = (value: string) => {
     setSearchTerm(value);
   };
+
+  const handleEditIcon = (service: ServiceWithId) => {
+    setSelectedService(service);
+  };
   const filteredData = data?.filter((service) =>
     service.service?.tenDv?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  useEffect(() => {
+    if (selectedService) {
+      navigate(`/edit-service/${selectedService.id}`);
+    }
+  }, [selectedService, navigate]);
   const columns = [
     {
       title: "Mã dịch vụ",
@@ -69,7 +81,7 @@ const Service: React.FC = () => {
       key: "action",
       render: (record: ServiceWithId) => (
         <>
-          <Button>Cập nhật</Button>
+          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
         </>
       ),
     },
