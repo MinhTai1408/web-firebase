@@ -13,9 +13,10 @@ import AddDevices from "../components/deviceCompo/AddDevices";
 import Device from "./Device/Device";
 import ReadDevice from "../components/deviceCompo/ReadDevice";
 import Service from "./services/Service";
-import AddService from "../components/serviceCompo/AddService";
+
 import EditService from "./../components/serviceCompo/EditService";
 import EditDevice from "../components/deviceCompo/EditDevice";
+import AddService from "../components/serviceCompo/AddService";
 
 const Defautlayout = () => {
   return (

@@ -222,7 +222,6 @@ const EditDevice: React.FC = () => {
                         ]}
                       >
                         <Select
-                          allowClear
                           mode="multiple"
                           value={book?.book.dvsd}
                           onChange={(value) =>

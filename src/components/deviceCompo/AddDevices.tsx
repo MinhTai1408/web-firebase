@@ -60,10 +60,19 @@ const AddDevice: React.FC = () => {
   };
 
   const handleDeviceChange = (value: string[]) => {
+    const validValues = value.filter(
+      (val) =>
+        val === "Khám tim mạch" ||
+        val === "Khám sản phụ khoa" ||
+        val === "Khám răng hàm mặt" ||
+        val === "Khám tai mũi họng" ||
+        val === "Khám hô hấp" ||
+        val === "Khám tổng quát"
+    );
     setDeviceData((prevDeviceData) => {
       return {
         ...prevDeviceData,
-        dvsd: value,
+        dvsd: validValues,
       };
     });
   };
@@ -182,8 +191,9 @@ const AddDevice: React.FC = () => {
                       ]}
                     >
                       <Select>
-                        <Option value="option1">Option 1</Option>
-                        <Option value="option2">Option 2</Option>
+                        <Select.Option value="hard">Hard</Select.Option>
+                        <Select.Option value="medium">Medium</Select.Option>
+                        <Select.Option value="easy">Easy</Select.Option>
                       </Select>
                     </Form.Item>
                     <Form.Item
@@ -223,12 +233,7 @@ const AddDevice: React.FC = () => {
                         },
                       ]}
                     >
-                      <Select
-                        mode="multiple"
-                        allowClear
-                        placeholder="Please select"
-                        onChange={handleDeviceChange}
-                      >
+                      <Select mode="multiple" onChange={handleDeviceChange}>
                         <Select.Option value="Khám tim mạch">
                           Khám tim mạch
                         </Select.Option>
@@ -269,7 +274,7 @@ const AddDevice: React.FC = () => {
                   onClick={handleAddBook}
                   loading={loading}
                 >
-                  Lưu
+                  Thêm thiết bị
                 </Button>
               </Space>
             </div>

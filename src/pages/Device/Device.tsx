@@ -17,12 +17,29 @@ import { Content, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { Link, useNavigate } from "react-router-dom";
 import { SearchOutlined } from "@ant-design/icons";
-import { BookWithId, fetchBooks } from "../../features/deviceSlice";
+import { Book, BookWithId, fetchBooks } from "../../features/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import "../Device/Device.css";
 const MAX_DISPLAY_ITEMS = 2; //Xác định số lượng mục tối đa để hiển thị
 
 const Device: React.FC = () => {
+  const renderDvsd = (text: string[] | undefined) => {
+    const tooltipContent =
+      Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS
+        ? text.join(", ")
+        : "";
+
+    const displayContent =
+      Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS ? (
+        <>
+          {text.slice(0, MAX_DISPLAY_ITEMS).join(", ")} <a>Xem thêm...</a>
+        </>
+      ) : (
+        text
+      );
+
+    return <Tooltip title={tooltipContent}>{displayContent}</Tooltip>;
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const data: BookWithId[] | undefined = useAppSelector(
     (state) => state.books.booksArray
@@ -86,23 +103,7 @@ const Device: React.FC = () => {
       title: "Dịch vụ sử dụng",
       dataIndex: ["book", "dvsd"],
       key: "author",
-      render: (text: any) => (
-        <Tooltip
-          title={
-            Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS
-              ? text.join(", ")
-              : ""
-          }
-        >
-          {Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS ? (
-            <span>
-              {text.slice(0, MAX_DISPLAY_ITEMS).join(", ")} <a>Xem thêm...</a>
-            </span>
-          ) : (
-            text
-          )}
-        </Tooltip>
-      ),
+      render: (text: string[] | undefined) => renderDvsd(text),
     },
     {
       key: "action",
