@@ -19,6 +19,10 @@ import EditDevice from "../components/deviceCompo/EditDevice";
 import AddService from "../components/serviceCompo/AddService";
 
 import ReadService from "../components/serviceCompo/Read";
+import Accounts from "./Accounts/Accounts";
+import AddAccounts from "../components/accountsCompo/AddAccounts";
+
+import EditAccount from "./../components/accountsCompo/EditAccount";
 
 const Defautlayout = () => {
   return (
@@ -38,6 +42,17 @@ const Defautlayout = () => {
           <Route path="/add-service" element={<AddService />} />
           <Route path="/edit-service/:id" element={<EditService />} />
           <Route path="/read-service/:id" element={<ReadService />} />
+
+          <Route path="/settings/accounts" element={<Accounts />} />
+          <Route
+            path="/settings/accounts/add-accounts"
+            element={<AddAccounts />}
+          />
+
+          <Route
+            path="/settings/accounts/edit-accounts/:id"
+            element={<EditAccount />}
+          />
         </Route>
       </Routes>
     </div>

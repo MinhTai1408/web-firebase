@@ -160,7 +160,7 @@ const AddService: React.FC = () => {
                   Danh sách dịch vụ &gt;
                 </Link>
                 <Link to="#" style={{ color: "orange", left: 5 }}>
-                  Thêm dịch vụ &gt;
+                  Thêm dịch vụ
                 </Link>
               </p>
             </div>

@@ -19,11 +19,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
-// Query a Firestore collection
-const servicesRef = collection(db, "services");
-getDocs(servicesRef).then((querySnapshot) => {
-  querySnapshot.forEach((doc) => {
-    console.log(`${doc.id} => ${doc.data()}`);
-  });
-});
+
 export const auth = getAuth(app);
