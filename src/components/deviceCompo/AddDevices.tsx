@@ -8,8 +8,6 @@ import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 
-const { Option } = Select;
-
 type DeviceData = {
   maTb: string;
   loaiTb: string;

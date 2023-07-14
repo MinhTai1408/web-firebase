@@ -3,6 +3,7 @@ import authSilce from "../features/authSilce";
 
 import booksReducer from "../features/deviceSlice";
 import serviceReducer from "../features/serviceSlice";
+
 export const store = configureStore({
   reducer: {
     auth: authSilce,

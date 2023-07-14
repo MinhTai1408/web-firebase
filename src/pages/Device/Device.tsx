@@ -11,16 +11,19 @@ import {
   Select,
   Table,
   Tooltip,
+  Pagination,
 } from "antd";
 import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { Link, useNavigate } from "react-router-dom";
-import { SearchOutlined } from "@ant-design/icons";
-import { Book, BookWithId, fetchBooks } from "../../features/deviceSlice";
+import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { BookWithId, fetchBooks } from "../../features/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import "../Device/Device.css";
-const MAX_DISPLAY_ITEMS = 2; //Xác định số lượng mục tối đa để hiển thị
+
+const MAX_DISPLAY_ITEMS = 2; ////giới hạn số từ hiển thị trong cột dịch vụ sử dụng
+const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
 
 const Device: React.FC = () => {
   const renderDvsd = (text: string[] | undefined) => {
@@ -40,7 +43,10 @@ const Device: React.FC = () => {
 
     return <Tooltip title={tooltipContent}>{displayContent}</Tooltip>;
   };
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
   const data: BookWithId[] | undefined = useAppSelector(
     (state) => state.books.booksArray
   );
@@ -48,30 +54,40 @@ const Device: React.FC = () => {
   const navigate = useNavigate();
   const [selectedBook, setSelectedBook] = useState<BookWithId | null>(null);
   const [selected, setSelected] = useState<BookWithId | null>(null);
+
+  const filteredData = data?.filter((book) =>
+    book.book?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   //hiển thị bảng dữ liệu
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  //hành động nút tìm kiếm
+  //nút tìm kiếm
   const handleSearch = (value: string) => {
     setSearchTerm(value);
   };
 
-  //hành động nút edit
+  //nút cập nhật
   const handleEditIcon = (book: BookWithId) => {
     setSelectedBook(book);
   };
-  const filteredData = data?.filter((book) =>
-    book.book?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   useEffect(() => {
     if (selectedBook) {
       navigate(`/edit-device/${selectedBook.id}`);
     }
   }, [selectedBook, navigate]);
 
-  //hành động nút read
+  //phân trang
+  const currentData = filteredData?.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  const totalPageCount = Math.ceil((filteredData?.length ?? 0) / PAGE_SIZE);
+
+  //nút đọc dữ liệu
   const handleReadIcon = (book: BookWithId) => {
     setSelected(book);
     navigate(`/read-book/${book.id}`);
@@ -82,31 +98,87 @@ const Device: React.FC = () => {
     }
   }, [selected, navigate]);
 
-  //cột trong bảng
+  //các cột trong bảng
   const columns = [
     {
       title: "Mã thiết bị",
       dataIndex: ["book", "maTb"],
       key: "title",
+      width: 130,
     },
     {
       title: "Tên thiết bị",
       dataIndex: ["book", "tenTb"],
       key: "author",
+      width: 130,
     },
     {
       title: "Địa chỉ",
       dataIndex: ["book", "diaChi"],
+      width: 150,
       key: "author",
     },
     {
+      title: "Trạng thái hoạt động",
+      dataIndex: "trangThai",
+      width: 150,
+      key: "trangThai",
+      render: (text: string) => {
+        const color = text === "Hoạt động" ? "green" : "red";
+
+        return (
+          <>
+            <div
+              style={{
+                backgroundColor: color,
+                borderRadius: "50%",
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                marginRight: 10,
+              }}
+            />
+            {text}
+          </>
+        );
+      },
+    },
+    {
+      title: "Trạng thái kết nối",
+      dataIndex: "trangThaiKn",
+      width: 150,
+
+      key: "trangThaikn",
+      render: (text: string) => {
+        const color = text === "Kết nối" ? "green" : "red";
+
+        return (
+          <>
+            <div
+              style={{
+                backgroundColor: color,
+                borderRadius: "50%",
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                marginRight: 10,
+              }}
+            />
+            {text}
+          </>
+        );
+      },
+    },
+    {
       title: "Dịch vụ sử dụng",
+      width: 200,
       dataIndex: ["book", "dvsd"],
       key: "author",
       render: (text: string[] | undefined) => renderDvsd(text),
     },
     {
       key: "action",
+      width: 50,
       render: (record: BookWithId) => (
         <>
           <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
@@ -115,6 +187,7 @@ const Device: React.FC = () => {
     },
     {
       key: "action",
+      width: 50,
       render: (record: BookWithId) => (
         <>
           <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
@@ -122,7 +195,11 @@ const Device: React.FC = () => {
       ),
     },
   ];
-
+  const dataSource = currentData?.map((item) => ({
+    ...item,
+    trangThai: Math.random() < 0.5 ? "Hoạt động" : "Ngưng hoạt động",
+    trangThaiKn: Math.random() < 0.5 ? "Kết nối" : "Mất kết nối",
+  }));
   return (
     <Layout>
       <Sider>
@@ -232,24 +309,35 @@ const Device: React.FC = () => {
           </Row>
           <Row style={{ paddingTop: 20 }}>
             <Col span={22}>
-              <div className="view-books">
-                {filteredData?.length > 0 ? (
-                  <Table
-                    columns={columns}
-                    dataSource={filteredData}
-                    scroll={{ x: "max-content" }}
-                  />
-                ) : (
-                  <div>There are no books matching your search!</div>
-                )}
-              </div>
+              <Table
+                dataSource={dataSource}
+                columns={columns}
+                pagination={false}
+                rowKey={(record) => record.id}
+              />
+              <Pagination
+                style={{ marginTop: 16, textAlign: "end" }}
+                current={currentPage}
+                total={totalPageCount * PAGE_SIZE}
+                pageSize={PAGE_SIZE}
+                onChange={(page) => setCurrentPage(page)}
+              />
             </Col>
             <Col span={2} style={{ left: 10 }}>
-              <Link to={"/add-device"}>
-                <Card style={{ backgroundColor: "#FFF2E7" }}>
+              <Card style={{ width: 70, backgroundColor: "#ffc069" }}>
+                <Link to={"/add-device"}>
+                  <Button
+                    style={{
+                      right: 10,
+                      fontSize: 15,
+                      backgroundColor: "#fa8c16",
+                    }}
+                  >
+                    <EditOutlined />
+                  </Button>
                   <p>Thêm thiết bị</p>
-                </Card>
-              </Link>
+                </Link>
+              </Card>
             </Col>
           </Row>
         </Content>

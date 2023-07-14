@@ -18,6 +18,8 @@ import EditService from "./../components/serviceCompo/EditService";
 import EditDevice from "../components/deviceCompo/EditDevice";
 import AddService from "../components/serviceCompo/AddService";
 
+import ReadService from "../components/serviceCompo/Read";
+
 const Defautlayout = () => {
   return (
     <div>
@@ -26,13 +28,16 @@ const Defautlayout = () => {
         <Route path="/forgotnew" element={<ForgotPasswordNew />} />
         <Route element={<AuthRoutes />}>
           <Route path="/home" element={<Home />} />
+
           <Route path="/device" element={<Device />} />
           <Route path="/add-device" element={<AddDevices />} />
           <Route path="/edit-device/:id" element={<EditDevice />} />
           <Route path="/read-book/:id" element={<ReadDevice />} />
+
           <Route path="/service" element={<Service />} />
           <Route path="/add-service" element={<AddService />} />
           <Route path="/edit-service/:id" element={<EditService />} />
+          <Route path="/read-service/:id" element={<ReadService />} />
         </Route>
       </Routes>
     </div>

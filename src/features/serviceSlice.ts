@@ -12,10 +12,10 @@ import { db } from "../Firebase";
 
 export interface Service {
   maDv: string;
+  maDvCap: string;
   tenDv: string;
   moTa: string;
 }
-
 export interface ServiceWithId {
   id: string;
   service: Service;
@@ -46,16 +46,16 @@ export const fetchService = createAsyncThunk<ServiceWithId[]>(
     return services;
   }
 );
-
+// update service
 export const updateService = createAsyncThunk<ServiceWithId, ServiceWithId>(
   "services/updateService",
-  async (editedBook) => {
-    if (!editedBook.service) {
+  async (editedService) => {
+    if (!editedService.service) {
       throw new Error("Invalid book data");
     }
-    const serviceRef = doc(db, "Service", editedBook.id);
-    await updateDoc(serviceRef, editedBook.service as Partial<Service>);
-    return editedBook;
+    const serviceRef = doc(db, "Service", editedService.id);
+    await updateDoc(serviceRef, editedService.service as Partial<Service>);
+    return editedService;
   }
 );
 

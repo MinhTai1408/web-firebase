@@ -11,48 +11,76 @@ import {
   DatePickerProps,
   Form,
   Input,
+  Pagination,
   Row,
   Select,
   Space,
   Table,
 } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { ServiceWithId, fetchService } from "../../features/serviceSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 
+const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
+
 const Service: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selected, setSelected] = useState<ServiceWithId | null>(null);
+  const [selectedup, setSelectedup] = useState<ServiceWithId | null>(null);
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const data: ServiceWithId[] | undefined = useAppSelector(
     (state) => state.service.serviceArray
   );
-  const [selectedService, setSelectedService] = useState<ServiceWithId | null>(
-    null
-  );
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+
   const onChange: DatePickerProps["onChange"] = (date, dateString) => {
     console.log(date, dateString);
   };
+
   //hiển thị bảng dữ liệu
   useEffect(() => {
     dispatch(fetchService());
   }, [dispatch]);
 
+  //tìm kiếm
   const handleSearch = (value: string) => {
     setSearchTerm(value);
+    setCurrentPage(1);
   };
 
-  const handleEditIcon = (service: ServiceWithId) => {
-    setSelectedService(service);
-  };
   const filteredData = data?.filter((service) =>
     service.service?.tenDv?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  //phân trang
+  const currentData = filteredData?.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+  const totalPageCount = Math.ceil((filteredData?.length ?? 0) / PAGE_SIZE);
+
+  //đọc dữ liệu
+  const handleReadIcon = (service: ServiceWithId) => {
+    setSelected(service);
+    navigate(`/read-service/${service.id}`);
+  };
   useEffect(() => {
-    if (selectedService) {
-      navigate(`/edit-service/${selectedService.id}`);
+    if (selected) {
+      navigate(`/read-service/${selected.id}`);
     }
-  }, [selectedService, navigate]);
+  }, [selected, navigate]);
+  //nút cập nhật
+  const handleEditIcon = (service: ServiceWithId) => {
+    setSelectedup(service);
+  };
+  useEffect(() => {
+    if (selectedup) {
+      navigate(`/edit-service/${selectedup.id}`);
+    }
+  }, [selectedup, navigate]);
   const columns = [
     {
       title: "Mã dịch vụ",
@@ -70,15 +98,41 @@ const Service: React.FC = () => {
       key: "moTa",
     },
     {
+      title: "Trạng thái",
+      dataIndex: "trangThai",
+      key: "trangThai",
+      render: (text: string) => {
+        const color = text === "Hoạt động" ? "green" : "red";
+
+        return (
+          <>
+            <div
+              style={{
+                backgroundColor: color,
+                borderRadius: "50%",
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                marginRight: 10,
+              }}
+            />
+            {text}
+          </>
+        );
+      },
+    },
+    {
       key: "action",
+      width: 50,
       render: (record: ServiceWithId) => (
         <>
-          <Button>Đọc</Button>
+          <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
         </>
       ),
     },
     {
       key: "action",
+      width: 50,
       render: (record: ServiceWithId) => (
         <>
           <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
@@ -86,6 +140,10 @@ const Service: React.FC = () => {
       ),
     },
   ];
+  const dataSource = currentData?.map((item) => ({
+    ...item,
+    trangThai: Math.random() < 0.5 ? "Hoạt động" : "Ngưng hoạt động",
+  }));
   return (
     <div>
       <Layout>
@@ -174,24 +232,35 @@ const Service: React.FC = () => {
             </Row>
             <Row style={{ paddingTop: 20 }}>
               <Col span={22}>
-                <div className="view-books">
-                  {filteredData?.length > 0 ? (
-                    <Table
-                      columns={columns}
-                      dataSource={filteredData}
-                      scroll={{ x: "max-content" }}
-                    />
-                  ) : (
-                    <div>There are no books matching your search!</div>
-                  )}
-                </div>
+                <Table
+                  dataSource={dataSource}
+                  columns={columns}
+                  pagination={false}
+                  rowKey={(record) => record.id}
+                />
+                <Pagination
+                  style={{ marginTop: 16, textAlign: "end" }}
+                  current={currentPage}
+                  total={totalPageCount * PAGE_SIZE}
+                  pageSize={PAGE_SIZE}
+                  onChange={(page) => setCurrentPage(page)}
+                />
               </Col>
               <Col span={2} style={{ left: 10 }}>
-                <Link to={"/add-service"}>
-                  <Card style={{ backgroundColor: "#FFF2E7" }}>
-                    <p>Thêm thiết bị</p>
-                  </Card>
-                </Link>
+                <Card style={{ width: 70, backgroundColor: "#ffc069" }}>
+                  <Link to={"/add-service"}>
+                    <Button
+                      style={{
+                        right: 10,
+                        fontSize: 15,
+                        backgroundColor: "#fa8c16",
+                      }}
+                    >
+                      <EditOutlined />
+                    </Button>
+                    <p>Thêm dịch vụ</p>
+                  </Link>
+                </Card>
               </Col>
             </Row>
           </Content>

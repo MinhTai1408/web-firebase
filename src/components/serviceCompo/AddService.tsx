@@ -1,62 +1,144 @@
 import React, { useState } from "react";
 import { useAppDispatch } from "../../hooks/storeHook";
 import { Link, useNavigate } from "react-router-dom";
-import { addServiceToFirestore } from "../../features/serviceSlice";
+import { Service, addServiceToFirestore } from "../../features/serviceSlice";
 import { toast } from "react-toastify";
-import { Button, Checkbox, Col, Form, Input, Layout, Row, Space } from "antd";
+import {
+  Button,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  Layout,
+  Row,
+  Select,
+  Space,
+} from "antd";
 import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import TextArea from "antd/es/input/TextArea";
 import { CheckboxValueType } from "antd/es/checkbox/Group";
-
-type ServiceData = {
-  maDv: string;
-  tenDv: string;
-  moTa: string;
-  text: CheckboxValueType[];
-};
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 
 const AddService: React.FC = () => {
   const [form] = Form.useForm();
   const [size] = useState(12);
   const [loading, setLoading] = useState(false);
-  const [serviceData, setServiceData] = useState<ServiceData>({
-    maDv: "",
-    tenDv: "",
-    moTa: "",
-    text: [],
-  });
+  const [numberRule, setNumberRule] = useState<string>("");
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const handleNumberRuleChange = (e: CheckboxValueType[]) => {
+    const prefixSelected = e.includes("prefix_0001");
+    const surfixSelected = e.includes("surfix_0001");
+    const autoIncrementSelected = e.includes("0001_9999");
+
+    if (prefixSelected && autoIncrementSelected) {
+      setNumberRule("prefix_auto_increment");
+    } else if (surfixSelected && autoIncrementSelected) {
+      setNumberRule("surfix_auto_increment");
+    } else if (autoIncrementSelected) {
+      setNumberRule("auto_increment");
+    } else {
+      setNumberRule("");
+    }
+  };
+
+  const generateNumber = (counter: number) => {
+    // Generate a 4-digit number based on the counter value
+    return String(counter).padStart(4, "0");
+  };
+
+  let previousMaDv = "";
+  let surfixMaDv = "";
+  let counter = 1;
+
   const handleAddService = async () => {
     try {
       const values = await form.validateFields();
       setLoading(true);
-      let service = {
+
+      // Check if the selected number rule is valid
+      if (!numberRule) {
+        setLoading(false);
+        toast.error("Vui lòng chọn ít nhất một quy tắc cấp số tự động!");
+        return;
+      }
+
+      // Get the list of services from Firestore
+      const querySnapshot = await getDocs(
+        collection(getFirestore(), "Service")
+      );
+      const services = querySnapshot.docs.map((doc) => doc.data());
+
+      let newMaDvCap = "";
+
+      // Check if maDv has changed
+      if (values.maDv !== previousMaDv) {
+        // Reset the counter if maDv has changed
+        counter = 1;
+      }
+      if (values.maDv !== surfixMaDv) {
+        // Reset the counter if maDv has changed
+        counter = 1;
+      }
+
+      // Generate a new unique maDvCap based on the selected number rule
+      switch (numberRule) {
+        case "prefix_auto_increment":
+          newMaDvCap = `${values.maDv}${generateNumber(counter)}`;
+
+          break;
+        case "surfix_auto_increment":
+          newMaDvCap = `${generateNumber(counter)}${values.maDv}`;
+          break;
+        case "auto_increment":
+          newMaDvCap = `${values.maDv}${generateNumber(counter)}`;
+          break;
+      }
+      // Check if the new maDvCap is unique
+      const existingMaDvCap = services.map((service) => service.maDvCap);
+      while (existingMaDvCap.includes(newMaDvCap)) {
+        counter++;
+        switch (numberRule) {
+          case "prefix_auto_increment":
+            newMaDvCap = `${values.maDv}${generateNumber(counter)}`;
+
+            break;
+          case "surfix_auto_increment":
+            newMaDvCap = `${generateNumber(counter)}${values.maDv}`;
+            break;
+          case "auto_increment":
+            newMaDvCap = `${values.maDv}${generateNumber(counter)}`;
+            break;
+        }
+      }
+      // Save the current maDv for the next submission
+      previousMaDv = values.maDv;
+      surfixMaDv = values.maDv;
+
+      let service: Service = {
         maDv: values.maDv,
+        maDvCap: newMaDvCap,
         tenDv: values.tenDv,
         moTa: values.moTa,
-        text: serviceData.text,
       };
+
       dispatch(addServiceToFirestore(service)).then(() => {
         setLoading(false);
-        toast.success("Add success");
+        toast.success("Thêm dịch vụ thành công");
         navigate("/service");
       });
+
+      // Save the current maDv for the next submission
+      previousMaDv = values.maDv;
     } catch (error) {
       console.log("Validation failed:", error);
     }
   };
-  const handleServiceChange = (value: CheckboxValueType[]) => {
-    setServiceData((prevDeviceData) => {
-      return {
-        ...prevDeviceData,
-        text: value,
-      };
-    });
-  };
+
   return (
     <div>
       <Layout>
@@ -73,12 +155,12 @@ const AddService: React.FC = () => {
               }}
             >
               <p style={{ fontWeight: 500, color: "black" }}>
-                Dịch vụ &gt; &ensp;
+                Dịch vụ &gt;
                 <Link to="/service" style={{ color: "black", left: 5 }}>
-                  Danh sách dịch vụ &gt; &ensp;
+                  Danh sách dịch vụ &gt;
                 </Link>
                 <Link to="#" style={{ color: "orange", left: 5 }}>
-                  Thêm dịch vụ
+                  Thêm dịch vụ &gt;
                 </Link>
               </p>
             </div>
@@ -172,11 +254,40 @@ const AddService: React.FC = () => {
               >
                 Quy tắc cấp số
               </p>
-              <Form style={{ marginLeft: 15, marginRight: 15 }}>
-                <Checkbox.Group onChange={handleServiceChange}>
-                  <Checkbox value="tai">Option 1</Checkbox>
-                  <Checkbox value="phuc">Option 2</Checkbox>
-                </Checkbox.Group>
+              <Form
+                style={{ marginLeft: 15, marginRight: 15 }}
+                initialValues={{ numberRule: [] }}
+              >
+                <Form.Item
+                  name="numberRule"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng chọn ít nhất một quy tắc!",
+                    },
+                  ]}
+                >
+                  <Checkbox.Group onChange={handleNumberRuleChange}>
+                    <Row>
+                      <Col span={24}>
+                        <Checkbox value="0001_9999">
+                          Tăng tự động: từ 0001 đến 9999
+                        </Checkbox>
+                      </Col>
+                      <Col span={24}>
+                        <Checkbox value="prefix_0001">Prefix: 0001</Checkbox>
+                      </Col>
+                      <Col span={24}>
+                        <Checkbox value="surfix_0001">Surfix: 0001</Checkbox>
+                      </Col>
+                      <Col span={24}>
+                        <Checkbox value="reset_daily">
+                          Reset mỗi ngày (đặt lại hàng ngày)
+                        </Checkbox>
+                      </Col>
+                    </Row>
+                  </Checkbox.Group>
+                </Form.Item>
               </Form>
             </Content>
             <div

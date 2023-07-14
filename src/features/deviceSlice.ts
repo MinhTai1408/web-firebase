@@ -23,6 +23,7 @@ export interface Book {
 export interface BookWithId {
   id: string;
   book: Book;
+  trangThai?: string | undefined;
 }
 
 interface BooksState {
