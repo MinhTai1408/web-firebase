@@ -178,9 +178,10 @@ const EditDevice: React.FC = () => {
                         ]}
                       >
                         <Select placeholder="Select a course type">
-                          <Select.Option value="hard">Hard</Select.Option>
-                          <Select.Option value="medium">Medium</Select.Option>
-                          <Select.Option value="easy">Easy</Select.Option>
+                          <Select.Option value="Kiosk">Kiosk</Select.Option>
+                          <Select.Option value="Display counter">
+                            Display counter
+                          </Select.Option>
                         </Select>
                       </Form.Item>
 

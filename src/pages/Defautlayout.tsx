@@ -4,8 +4,6 @@ import { Route, Routes } from "react-router-dom";
 import ForgotPassword from "./login/forgot_password";
 import ForgotPasswordNew from "./login/forgot_password_new";
 
-import Home from "./Home/Home";
-
 import AuthRoutes from "../components/deviceCompo/AuthAction";
 
 import AddDevices from "../components/deviceCompo/AddDevices";
@@ -23,6 +21,10 @@ import Accounts from "./Accounts/Accounts";
 import AddAccounts from "../components/accountsCompo/AddAccounts";
 
 import EditAccount from "./../components/accountsCompo/EditAccount";
+import Profile from "./profile/Profile";
+import AddCapSo from "./../components/capso/AddCapSo";
+import CapSo from "./QuanLiCapSo/CapSo";
+import ReadCapSo from "../components/capso/ReadCapSo";
 
 const Defautlayout = () => {
   return (
@@ -31,7 +33,7 @@ const Defautlayout = () => {
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/forgotnew" element={<ForgotPasswordNew />} />
         <Route element={<AuthRoutes />}>
-          <Route path="/home" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
 
           <Route path="/device" element={<Device />} />
           <Route path="/add-device" element={<AddDevices />} />
@@ -43,12 +45,15 @@ const Defautlayout = () => {
           <Route path="/edit-service/:id" element={<EditService />} />
           <Route path="/read-service/:id" element={<ReadService />} />
 
+          <Route path="/number" element={<CapSo />} />
+          <Route path="/add-number" element={<AddCapSo />} />
+          <Route path="/read-capso/:id" element={<ReadCapSo />} />
+
           <Route path="/settings/accounts" element={<Accounts />} />
           <Route
             path="/settings/accounts/add-accounts"
             element={<AddAccounts />}
           />
-
           <Route
             path="/settings/accounts/edit-accounts/:id"
             element={<EditAccount />}

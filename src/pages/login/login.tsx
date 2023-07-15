@@ -23,7 +23,7 @@ const Login = () => {
 
   useEffect(() => {
     if (Boolean(user)) {
-      navigate("/home");
+      navigate("/profile");
     }
   }, [user, navigate]);
 

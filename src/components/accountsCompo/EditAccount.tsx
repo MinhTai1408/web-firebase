@@ -237,6 +237,18 @@ const EditAccount: React.FC = () => {
                             required: true,
                             message: "Vui lòng nhập mật khẩu!",
                           },
+                          ({ getFieldValue }) => ({
+                            validator(_, value) {
+                              if (
+                                !value ||
+                                getFieldValue("matKhau") === value
+                              ) {
+                                return Promise.resolve();
+                              }
+
+                              toast.error("Mật khẩu không khớp!");
+                            },
+                          }),
                         ]}
                       >
                         <Input.Password />

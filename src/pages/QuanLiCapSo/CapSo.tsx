@@ -1,128 +1,119 @@
-import React, { useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { CapSoWithId, fetchCapSoList } from "../../features/capSoSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
   Col,
+  DatePicker,
+  DatePickerProps,
   Form,
   Input,
   Layout,
+  Pagination,
   Row,
   Select,
+  Space,
   Table,
-  Tooltip,
-  Pagination,
 } from "antd";
+import Sider from "antd/es/layout/Sider";
 import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
-import Sider from "antd/es/layout/Sider";
-import { Link, useNavigate } from "react-router-dom";
 import { EditOutlined, SearchOutlined } from "@ant-design/icons";
-import { BookWithId, fetchBooks } from "../../features/deviceSlice";
-import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
-import "../Device/Device.css";
-
-const MAX_DISPLAY_ITEMS = 2; ////giới hạn số từ hiển thị trong cột dịch vụ sử dụng
 const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
-
-const Device: React.FC = () => {
-  const renderDvsd = (text: string[] | undefined) => {
-    const tooltipContent =
-      Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS
-        ? text.join(", ")
-        : "";
-
-    const displayContent =
-      Array.isArray(text) && text.length > MAX_DISPLAY_ITEMS ? (
-        <>
-          {text.slice(0, MAX_DISPLAY_ITEMS).join(", ")} <a>Xem thêm...</a>
-        </>
-      ) : (
-        text
-      );
-
-    return <Tooltip title={tooltipContent}>{displayContent}</Tooltip>;
-  };
-
+const CapSo: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const data: BookWithId[] | undefined = useAppSelector(
-    (state) => state.books.booksArray
-  );
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const [selectedBook, setSelectedBook] = useState<BookWithId | null>(null);
-  const [selected, setSelected] = useState<BookWithId | null>(null);
+  const [selected, setSelected] = useState<CapSoWithId | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
-  const filteredData = data?.filter((book) =>
-    book.book?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
+  const dataCapSo: CapSoWithId[] | undefined = useAppSelector(
+    (state) => state.capso.capSoList
   );
 
-  //hiển thị bảng dữ liệu
+  const onChange: DatePickerProps["onChange"] = (date, dateString) => {
+    console.log(date, dateString);
+  };
+
   useEffect(() => {
-    dispatch(fetchBooks());
+    dispatch(fetchCapSoList());
   }, [dispatch]);
 
-  //nút tìm kiếm
+  const filteredData = dataCapSo
+    ?.filter((capSo) =>
+      capSo.capSo?.tenDichVu?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((capSo) =>
+      selectedStatus ? capSo.capSo?.tenDichVu === selectedStatus : true
+    );
+
+  //tìm kiếm
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     setCurrentPage(1);
   };
 
-  //nút cập nhật
-  const handleEditIcon = (book: BookWithId) => {
-    setSelectedBook(book);
-  };
-  useEffect(() => {
-    if (selectedBook) {
-      navigate(`/edit-device/${selectedBook.id}`);
-    }
-  }, [selectedBook, navigate]);
+  //sắp xếp thứ tự
+  const sortedData: CapSoWithId[] =
+    filteredData?.sort((a, b) => {
+      const sttA = a.capSo?.thuTu ?? 0;
+      const sttB = b.capSo?.thuTu ?? 0;
+      return sttA - sttB;
+    }) ?? [];
 
   //phân trang
-  const currentData = filteredData?.slice(
+  const currentData = sortedData.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
-
   const totalPageCount = Math.ceil((filteredData?.length ?? 0) / PAGE_SIZE);
 
-  //nút đọc dữ liệu
-  const handleReadIcon = (book: BookWithId) => {
-    setSelected(book);
-    navigate(`/read-book/${book.id}`);
+  //đọc dữ liệu
+  const handleReadIcon = (capSo: CapSoWithId) => {
+    setSelected(capSo);
+    navigate(`/read-capso/${capSo.id}`);
   };
   useEffect(() => {
     if (selected) {
-      navigate(`/read-book/${selected.id}`);
+      navigate(`/read-capso/${selected.id}`);
     }
   }, [selected, navigate]);
 
-  //các cột trong bảng
-  const columns = [
+  const colums = [
     {
-      title: "Mã thiết bị",
-      dataIndex: ["book", "maTb"],
-      key: "title",
-      width: 130,
+      title: "Stt",
+      dataIndex: ["capSo", "thuTu"],
+      key: "stt",
     },
     {
-      title: "Tên thiết bị",
-      dataIndex: ["book", "tenTb"],
-      key: "author",
-      width: 130,
+      title: "Tên khách hàng",
+      dataIndex: "tenKhachHang",
+      key: "tenKhachHang",
     },
     {
-      title: "Địa chỉ",
-      dataIndex: ["book", "diaChi"],
-      width: 150,
-      key: "author",
+      title: "Tên dịch vụ",
+      dataIndex: ["capSo", "tenDichVu"],
+      key: "tenDichVu",
+    },
+    {
+      title: "Ngày giờ cấp",
+      dataIndex: ["capSo", "ngayGioCap"],
+      key: "ngayGioCap",
+    },
+    {
+      title: "Hạn sử dụng",
+      dataIndex: ["capSo", "hanSuDung"],
+      key: "hanSuDung",
     },
     {
       title: "Trạng thái hoạt động",
       dataIndex: "trangThai",
-      width: 150,
+
       key: "trangThai",
       render: (text: string) => {
         const color = text === "Hoạt động" ? "green" : "red";
@@ -145,53 +136,16 @@ const Device: React.FC = () => {
       },
     },
     {
-      title: "Trạng thái kết nối",
-      dataIndex: "trangThaiKn",
-      width: 150,
-
-      key: "trangThaikn",
-      render: (text: string) => {
-        const color = text === "Kết nối" ? "green" : "red";
-
-        return (
-          <>
-            <div
-              style={{
-                backgroundColor: color,
-                borderRadius: "50%",
-                display: "inline-block",
-                width: 10,
-                height: 10,
-                marginRight: 10,
-              }}
-            />
-            {text}
-          </>
-        );
-      },
-    },
-    {
-      title: "Dịch vụ sử dụng",
-      width: 200,
-      dataIndex: ["book", "dvsd"],
-      key: "author",
-      render: (text: string[] | undefined) => renderDvsd(text),
+      title: "Nguồn cấp",
+      dataIndex: "nguonCap",
+      key: "nguonCap",
     },
     {
       key: "action",
       width: 50,
-      render: (record: BookWithId) => (
+      render: (record: CapSoWithId) => (
         <>
           <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
-        </>
-      ),
-    },
-    {
-      key: "action",
-      width: 50,
-      render: (record: BookWithId) => (
-        <>
-          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
         </>
       ),
     },
@@ -199,7 +153,6 @@ const Device: React.FC = () => {
   const dataSource = currentData?.map((item) => ({
     ...item,
     trangThai: Math.random() < 0.5 ? "Hoạt động" : "Ngưng hoạt động",
-    trangThaiKn: Math.random() < 0.5 ? "Kết nối" : "Mất kết nối",
   }));
   return (
     <Layout>
@@ -216,9 +169,9 @@ const Device: React.FC = () => {
             }}
           >
             <p style={{ fontWeight: 500, color: "black" }}>
-              Thiết bị &gt;
-              <Link to="/device" style={{ color: "orange", right: 5 }}>
-                Danh sách thiết bị
+              Cấp số &gt;
+              <Link to="#" style={{ color: "orange", right: 5 }}>
+                Danh sách cấp số
               </Link>
             </p>
           </div>
@@ -232,15 +185,13 @@ const Device: React.FC = () => {
               textAlign: "start",
             }}
           >
-            Danh sách thiết bị
+            Quản lý cấp số
           </p>
-
           <Row>
-            <Col span={6}>
-              <Form.Item label="Trạng thái hoạt động" />
+            <Col span={3}>
+              <Form.Item label="Tên dịch vụ" />
               <Select
                 showSearch
-                style={{ width: 200 }}
                 placeholder="Tất cả"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
@@ -253,26 +204,25 @@ const Device: React.FC = () => {
                 }
                 options={[
                   {
-                    value: "1",
+                    value: null,
                     label: "Tất cả",
                   },
                   {
-                    value: "2",
-                    label: "Hoạt động",
+                    value: "dichVu1",
+                    label: "dichVu1",
                   },
                   {
-                    value: "3",
-                    label: "Ngưng hoạt động",
+                    value: "dichVu2",
+                    label: "dichVu2",
                   },
                 ]}
+                onChange={(value) => setSelectedStatus(value)}
               />
             </Col>
-            <Col span={8}>
-              <Form.Item label="Trạng thái kết nối " />
-
+            <Col span={3}>
+              <Form.Item label="Tình trạng " />
               <Select
                 showSearch
-                style={{ width: 200 }}
                 placeholder="Tất cả"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
@@ -299,7 +249,47 @@ const Device: React.FC = () => {
                 ]}
               />
             </Col>
-            <Col span={7}>
+            <Col span={3}>
+              <Form.Item label="Tình trạng " />
+              <Select
+                showSearch
+                placeholder="Tất cả"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.label ?? "").includes(input)
+                }
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? "")
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? "").toLowerCase())
+                }
+                options={[
+                  {
+                    value: "1",
+                    label: "Tất cả",
+                  },
+                  {
+                    value: "2",
+                    label: "Kết nối",
+                  },
+                  {
+                    value: "3",
+                    label: "Mất kết nối",
+                  },
+                ]}
+              />
+            </Col>
+            <Col span={10}>
+              <Form.Item label="Chọn thời gian " />
+              <Space direction="vertical">
+                <DatePicker onChange={onChange} />
+              </Space>{" "}
+              &gt;{" "}
+              <Space direction="vertical">
+                <DatePicker onChange={onChange} />
+              </Space>
+            </Col>
+            <Col span={4}>
               <Form.Item label="Từ khóa" />
               <Input
                 placeholder="Nhập từ khóa"
@@ -307,12 +297,10 @@ const Device: React.FC = () => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </Col>
-          </Row>
-          <Row style={{ paddingTop: 20 }}>
-            <Col span={22}>
+            <Col span={22} style={{ paddingTop: 20 }}>
               <Table
                 dataSource={dataSource}
-                columns={columns}
+                columns={colums}
                 pagination={false}
                 rowKey={(record) => record.id}
               />
@@ -324,9 +312,15 @@ const Device: React.FC = () => {
                 onChange={(page) => setCurrentPage(page)}
               />
             </Col>
-            <Col span={2} style={{ left: 10 }}>
-              <Card style={{ width: 70, backgroundColor: "#ffc069" }}>
-                <Link to={"/add-device"}>
+            <Col span={2} style={{ left: 10, paddingTop: 20 }}>
+              <Card
+                style={{
+                  width: 70,
+
+                  backgroundColor: "#ffc069",
+                }}
+              >
+                <Link to={"/add-number"}>
                   <Button
                     style={{
                       right: 10,
@@ -336,7 +330,7 @@ const Device: React.FC = () => {
                   >
                     <EditOutlined />
                   </Button>
-                  <p>Thêm thiết bị</p>
+                  <p>Cấp số</p>
                 </Link>
               </Card>
             </Col>
@@ -347,4 +341,4 @@ const Device: React.FC = () => {
   );
 };
 
-export default Device;
+export default CapSo;

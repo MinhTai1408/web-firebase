@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Link, Route, Routes } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Layout, Menu, Image } from "antd";
 import {
   AppstoreOutlined,
@@ -13,18 +13,14 @@ import {
 import MenuItem from "../../model/menuItem";
 import "../Menu/Slide.css";
 
-import Home from "../Home/Home";
-import Device from "../Device/Device";
-import Service from "../services/Service";
-
-const { Sider, Content } = Layout;
+const { Sider } = Layout;
 const { SubMenu } = Menu;
 
 const DASHBOARD_ITEM: MenuItem = {
   key: "1",
   icon: <AppstoreOutlined />,
   label: "Dashboard",
-  path: "/home",
+  path: "/profile",
 };
 const DEVICE_ITEM: MenuItem = {
   key: "2",
@@ -129,19 +125,6 @@ const Slide: FC<SlideProps> = ({ handleLogout }) => {
           <span className="btn-text__logout">Đăng xuất</span>
         </Button>
       </Sider>
-      <Content>
-        <Routes>
-          <Route path={DASHBOARD_ITEM.path} element={<Home />} />
-          <Route path={DEVICE_ITEM.path} element={<Device />} />
-          <Route path={SERVICE_ITEM.path} element={<Service />} />
-          {/* <Route path={NUMBER_ITEM.path} element={<Number />} />
-          <Route path={REPORT_ITEM.path} element={<Report />} />
-          <Route path={SETTINGS_ITEM.path} element={<Role />} />
-          <Route path={SETTINGS_ITEM.children![0].path} element={<Role />} />
-          <Route path={SETTINGS_ITEM.children![1].path} element={<Account />} />
-          <Route path={SETTINGS_ITEM.children![2].path} element={<User />} /> */}
-        </Routes>
-      </Content>
     </Layout>
   );
 };

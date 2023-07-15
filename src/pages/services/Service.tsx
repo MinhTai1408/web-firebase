@@ -40,7 +40,6 @@ const Service: React.FC = () => {
     console.log(date, dateString);
   };
 
-  //hiển thị bảng dữ liệu
   useEffect(() => {
     dispatch(fetchService());
   }, [dispatch]);
@@ -72,6 +71,7 @@ const Service: React.FC = () => {
       navigate(`/read-service/${selected.id}`);
     }
   }, [selected, navigate]);
+
   //nút cập nhật
   const handleEditIcon = (service: ServiceWithId) => {
     setSelectedup(service);
@@ -81,6 +81,7 @@ const Service: React.FC = () => {
       navigate(`/edit-service/${selectedup.id}`);
     }
   }, [selectedup, navigate]);
+
   const columns = [
     {
       title: "Mã dịch vụ",
@@ -140,10 +141,12 @@ const Service: React.FC = () => {
       ),
     },
   ];
+
   const dataSource = currentData?.map((item) => ({
     ...item,
     trangThai: Math.random() < 0.5 ? "Hoạt động" : "Ngưng hoạt động",
   }));
+
   return (
     <div>
       <Layout>
