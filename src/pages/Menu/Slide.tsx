@@ -20,7 +20,7 @@ const DASHBOARD_ITEM: MenuItem = {
   key: "1",
   icon: <AppstoreOutlined />,
   label: "Dashboard",
-  path: "/profile",
+  path: "/home",
 };
 const DEVICE_ITEM: MenuItem = {
   key: "2",

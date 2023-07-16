@@ -12,16 +12,18 @@ import { logout } from "../../features/authSilce";
 import Sider from "antd/es/layout/Sider";
 import Menu from "../Menu/Menu";
 import { CameraOutlined } from "@ant-design/icons";
+import { Acounts } from "../../features/accountsSlice";
 
 const Profile = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [avatarURL, setAvatarURL] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
-
+  const [userData, setUserData] = useState<Acounts | null>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const storage = getStorage();
+  const accountsState = useAppSelector((state) => state.accounts);
 
   useEffect(() => {
     if (!user) {
@@ -30,12 +32,16 @@ const Profile = () => {
       // Fetch user data from Firestore
       const getUserData = async () => {
         try {
-          const userDocRef = doc(collection(db, "users"), user.id);
+          const userDocRef = doc(collection(db, "Account"), user.id); // Fix collection reference here
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
+            const userData = userDocSnap.data() as Acounts;
+            console.log("Fetched user data:", userData); // Debug statement to check fetched data
+            setUserData(userData);
             setAvatarURL(userData?.avatarURL || null);
+          } else {
+            console.log("User data does not exist."); // Debug statement for non-existing user data
           }
         } catch (error) {
           console.log("Error fetching user data: ", error);
@@ -64,7 +70,7 @@ const Profile = () => {
         const avatarDownloadURL = await getDownloadURL(storageRef);
 
         // Save the download URL to Firestore
-        const userDocRef = doc(collection(db, "users"), user?.id);
+        const userDocRef = doc(collection(db, "Account"), user?.id); // Fix collection reference here
         await setDoc(
           userDocRef,
           { avatarURL: avatarDownloadURL },
@@ -95,7 +101,15 @@ const Profile = () => {
           <div className="profile-avatar-camera" onClick={handleShowUploadForm}>
             <CameraOutlined />
           </div>
-          <h2>{user?.email}</h2>
+          {userData && (
+            <div>
+              <h2>{userData.email}</h2>
+              <p>Full Name: {userData.hoTen}</p>
+              <p>Phone: {userData.soDt}</p>
+              <p>Role: {userData.vaiTro}</p>
+              <p>Status: {userData.trangThai}</p>
+            </div>
+          )}
         </div>
 
         {showUploadForm && (

@@ -18,9 +18,10 @@ import { Content, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { Link, useNavigate } from "react-router-dom";
 import { EditOutlined, SearchOutlined } from "@ant-design/icons";
-import { BookWithId, fetchBooks } from "../../features/deviceSlice";
+
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import "../Device/Device.css";
+import { DeviceWithId, fetchDevice } from "../../features/deviceSlice";
 
 const MAX_DISPLAY_ITEMS = 2; ////giới hạn số từ hiển thị trong cột dịch vụ sử dụng
 const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
@@ -47,21 +48,21 @@ const Device: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const data: BookWithId[] | undefined = useAppSelector(
-    (state) => state.books.booksArray
+  const data: DeviceWithId[] | undefined = useAppSelector(
+    (state) => state.device.deviceArray
   );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [selectedBook, setSelectedBook] = useState<BookWithId | null>(null);
-  const [selected, setSelected] = useState<BookWithId | null>(null);
+  const [selectedBook, setSelectedBook] = useState<DeviceWithId | null>(null);
+  const [selected, setSelected] = useState<DeviceWithId | null>(null);
 
   const filteredData = data?.filter((book) =>
-    book.book?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
+    book.device?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   //hiển thị bảng dữ liệu
   useEffect(() => {
-    dispatch(fetchBooks());
+    dispatch(fetchDevice());
   }, [dispatch]);
 
   //nút tìm kiếm
@@ -71,8 +72,8 @@ const Device: React.FC = () => {
   };
 
   //nút cập nhật
-  const handleEditIcon = (book: BookWithId) => {
-    setSelectedBook(book);
+  const handleEditIcon = (device: DeviceWithId) => {
+    setSelectedBook(device);
   };
   useEffect(() => {
     if (selectedBook) {
@@ -89,9 +90,9 @@ const Device: React.FC = () => {
   const totalPageCount = Math.ceil((filteredData?.length ?? 0) / PAGE_SIZE);
 
   //nút đọc dữ liệu
-  const handleReadIcon = (book: BookWithId) => {
-    setSelected(book);
-    navigate(`/read-book/${book.id}`);
+  const handleReadIcon = (device: DeviceWithId) => {
+    setSelected(device);
+    navigate(`/read-book/${device.id}`);
   };
   useEffect(() => {
     if (selected) {
@@ -103,19 +104,19 @@ const Device: React.FC = () => {
   const columns = [
     {
       title: "Mã thiết bị",
-      dataIndex: ["book", "maTb"],
+      dataIndex: ["device", "maTb"],
       key: "title",
       width: 130,
     },
     {
       title: "Tên thiết bị",
-      dataIndex: ["book", "tenTb"],
+      dataIndex: ["device", "tenTb"],
       key: "author",
       width: 130,
     },
     {
       title: "Địa chỉ",
-      dataIndex: ["book", "diaChi"],
+      dataIndex: ["device", "diaChi"],
       width: 150,
       key: "author",
     },
@@ -173,14 +174,14 @@ const Device: React.FC = () => {
     {
       title: "Dịch vụ sử dụng",
       width: 200,
-      dataIndex: ["book", "dvsd"],
+      dataIndex: ["device", "dvsd"],
       key: "author",
       render: (text: string[] | undefined) => renderDvsd(text),
     },
     {
       key: "action",
       width: 50,
-      render: (record: BookWithId) => (
+      render: (record: DeviceWithId) => (
         <>
           <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
         </>
@@ -189,7 +190,7 @@ const Device: React.FC = () => {
     {
       key: "action",
       width: 50,
-      render: (record: BookWithId) => (
+      render: (record: DeviceWithId) => (
         <>
           <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
         </>

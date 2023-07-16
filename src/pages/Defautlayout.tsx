@@ -25,6 +25,8 @@ import Profile from "./profile/Profile";
 import AddCapSo from "./../components/capso/AddCapSo";
 import CapSo from "./QuanLiCapSo/CapSo";
 import ReadCapSo from "../components/capso/ReadCapSo";
+import Home from "./Home/Home";
+import Dashboards from "./Home/Home";
 
 const Defautlayout = () => {
   return (
@@ -34,6 +36,7 @@ const Defautlayout = () => {
         <Route path="/forgotnew" element={<ForgotPasswordNew />} />
         <Route element={<AuthRoutes />}>
           <Route path="/profile" element={<Profile />} />
+          <Route path="/home" element={<Dashboards />} />
 
           <Route path="/device" element={<Device />} />
           <Route path="/add-device" element={<AddDevices />} />

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Card, Col, Form, Layout, Row } from "antd";
-import { BookWithId } from "../../features/deviceSlice";
+
 import { useAppSelector } from "../../hooks/storeHook";
 import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
+import { DeviceWithId } from "../../features/deviceSlice";
 
 interface RouteParams {
   [key: string]: string | undefined;
@@ -14,15 +15,15 @@ interface RouteParams {
 
 const ReadDevice: React.FC = () => {
   const { id } = useParams<RouteParams>();
-  const [book, setBook] = useState<BookWithId | null>(null);
-  const booksArray: BookWithId[] | undefined = useAppSelector(
-    (state) => state.books.booksArray
+  const [book, setBook] = useState<DeviceWithId | null>(null);
+  const deviceArray: DeviceWithId[] | undefined = useAppSelector(
+    (state) => state.device.deviceArray
   );
 
   useEffect(() => {
-    const selectedBook = booksArray?.find((book) => book.id === id);
+    const selectedBook = deviceArray?.find((book) => book.id === id);
     setBook(selectedBook ?? null);
-  }, [booksArray, id]);
+  }, [deviceArray, id]);
 
   return (
     <div>
@@ -83,17 +84,17 @@ const ReadDevice: React.FC = () => {
                 <Form style={{ marginLeft: 15, marginRight: 15 }}>
                   <Row gutter={16}>
                     <Col span={12}>
-                      <p>Mã thiết bị: &ensp;{book.book.maTb}</p>
-                      <p>Tên thiết bị: &ensp;{book.book.tenTb}</p>
-                      <p>Địa chỉ: &ensp;{book.book.diaChi}</p>
+                      <p>Mã thiết bị: &ensp;{book.device.maTb}</p>
+                      <p>Tên thiết bị: &ensp;{book.device.tenTb}</p>
+                      <p>Địa chỉ: &ensp;{book.device.diaChi}</p>
                     </Col>
                     <Col span={12}>
-                      <p>Loại thiết bị: &ensp;{book.book.loaiTb}</p>
-                      <p>Tên đăng nhập: &ensp;{book.book.tenDn}</p>
-                      <p>Mật khẩu: &ensp;{book.book.matKhau}</p>
+                      <p>Loại thiết bị: &ensp;{book.device.loaiTb}</p>
+                      <p>Tên đăng nhập: &ensp;{book.device.tenDn}</p>
+                      <p>Mật khẩu: &ensp;{book.device.matKhau}</p>
                     </Col>
                     <Col span={24}>
-                      <p>Dịch vụ sử dụng: &ensp;{book.book.dvsd}</p>
+                      <p>Dịch vụ sử dụng: &ensp;{book.device.dvsd}</p>
                     </Col>
                   </Row>
                 </Form>

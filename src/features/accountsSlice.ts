@@ -19,6 +19,7 @@ export interface Acounts {
   matKhau: string;
   nhapMatKhau: string;
   trangThai: string;
+  avatarURL?: string;
 }
 export interface AccountsWithId {
   id: string;

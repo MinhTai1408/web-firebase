@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Select, Layout, Row, Col, Space } from "antd";
 import { useAppDispatch } from "../../hooks/storeHook";
-import { addBookToFirestore } from "../../features/deviceSlice";
+
 import { toast } from "react-toastify";
 import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
+import { addDeviceToFirestore } from "../../features/deviceSlice";
 
 type DeviceData = {
   maTb: string;
@@ -47,7 +48,7 @@ const AddDevice: React.FC = () => {
         matKhau: values.matKhau,
         dvsd: deviceData.dvsd,
       };
-      dispatch(addBookToFirestore(book)).then(() => {
+      dispatch(addDeviceToFirestore(book)).then(() => {
         setLoading(false);
         toast.success("Add success");
         navigate("/device");

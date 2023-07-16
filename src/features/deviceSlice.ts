@@ -10,7 +10,7 @@ import {
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { db } from "../Firebase";
 
-export interface Book {
+export interface Device {
   maTb: string;
   loaiTb: string;
   tenTb: string;
@@ -20,75 +20,77 @@ export interface Book {
   dvsd: string[] | string;
 }
 
-export interface BookWithId {
+export interface DeviceWithId {
   id: string;
-  book: Book;
+  device: Device;
   trangThai?: string | undefined;
 }
 
-interface BooksState {
-  booksArray: BookWithId[];
+interface DeviceState {
+  deviceArray: DeviceWithId[];
 }
 
 // add book to firestore
-export const addBookToFirestore = createAsyncThunk<BookWithId, Book>(
-  "books/addBookToFirestore",
-  async (book) => {
-    const addBookRef = await addDoc(collection(db, "Device"), book);
-    const newBook: BookWithId = { id: addBookRef.id, book };
+export const addDeviceToFirestore = createAsyncThunk<DeviceWithId, Device>(
+  "devices/addDeviceToFirestore",
+  async (device) => {
+    const addDeviceRef = await addDoc(collection(db, "Device"), device);
+    const newBook: DeviceWithId = { id: addDeviceRef.id, device };
     return newBook;
   }
 );
 
 // fetch books
-export const fetchBooks = createAsyncThunk<BookWithId[]>(
-  "books/fetchBooks",
+export const fetchDevice = createAsyncThunk<DeviceWithId[]>(
+  "devices/fetchDevice",
   async () => {
     const querySnapshot = await getDocs(collection(db, "Device"));
-    const books = querySnapshot.docs.map((doc) => ({
+    const devices = querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      book: doc.data() as Book,
+      device: doc.data() as Device,
     }));
-    return books;
+    return devices;
   }
 );
 
 // update book
-export const updateBook = createAsyncThunk<BookWithId, BookWithId>(
-  "books/updateBook",
-  async (editedBook) => {
-    if (!editedBook.book) {
+export const updateDevice = createAsyncThunk<DeviceWithId, DeviceWithId>(
+  "devices/updateDevice",
+  async (editedDevice) => {
+    if (!editedDevice.device) {
       throw new Error("Invalid book data");
     }
-    const bookRef = doc(db, "Device", editedBook.id);
-    await updateDoc(bookRef, editedBook.book as Partial<Book>);
-    return editedBook;
+    const deviceRef = doc(db, "Device", editedDevice.id);
+    await updateDoc(deviceRef, editedDevice.device as Partial<Device>);
+    return editedDevice;
   }
 );
 
-const booksSlice = createSlice({
-  name: "Books",
+const deviceSlice = createSlice({
+  name: "Devices",
   initialState: {
-    booksArray: [] as BookWithId[],
-  } as BooksState,
+    deviceArray: [] as DeviceWithId[],
+  } as DeviceState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchBooks.fulfilled, (state, action) => {
-        state.booksArray = action.payload;
+      .addCase(fetchDevice.fulfilled, (state, action) => {
+        state.deviceArray = action.payload;
       })
-      .addCase(addBookToFirestore.fulfilled, (state, action) => {
-        state.booksArray.push(action.payload);
+      .addCase(addDeviceToFirestore.fulfilled, (state, action) => {
+        state.deviceArray.push(action.payload);
       })
 
-      .addCase(updateBook.fulfilled, (state, action) => {
-        const { id, book } = action.payload;
-        const bookIndex = state.booksArray.findIndex((book) => book.id === id);
-        if (bookIndex !== -1) {
-          state.booksArray[bookIndex] = { id: id, book };
+      .addCase(updateDevice.fulfilled, (state, action) => {
+        const { id, device } = action.payload;
+        const devicendex = state.deviceArray.findIndex(
+          (device) => device.id === id
+        );
+        if (devicendex !== -1) {
+          state.deviceArray[devicendex] = { id: id, device };
         }
       });
   },
 });
 
-export default booksSlice.reducer;
+export default deviceSlice.reducer;

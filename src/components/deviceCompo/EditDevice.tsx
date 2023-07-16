@@ -6,9 +6,10 @@ import { toast } from "react-toastify";
 import Sider from "antd/es/layout/Sider";
 
 import { Content, Header } from "antd/es/layout/layout";
-import { BookWithId, updateBook } from "../../features/deviceSlice";
+
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import Menu from "../../pages/Menu/Menu";
+import { DeviceWithId, updateDevice } from "../../features/deviceSlice";
 
 interface EditParams {
   [key: string]: string | undefined;
@@ -18,26 +19,26 @@ interface EditParams {
 const EditDevice: React.FC = () => {
   const { id } = useParams<EditParams>();
   const [form] = Form.useForm();
-  const [book, setBook] = useState<BookWithId | null>(null);
+  const [book, setBook] = useState<DeviceWithId | null>(null);
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const booksArray: BookWithId[] | undefined = useAppSelector(
-    (state) => state.books.booksArray
+  const deviceArray: DeviceWithId[] | undefined = useAppSelector(
+    (state) => state.device.deviceArray
   );
 
   useEffect(() => {
-    const selectedBook = booksArray?.find((book) => book.id === id);
+    const selectedBook = deviceArray?.find((book) => book.id === id);
     setBook(selectedBook ?? null);
-  }, [booksArray, id]);
+  }, [deviceArray, id]);
 
   const handleUpdate = () => {
     const values = form.getFieldsValue();
     if (book) {
-      const updatedBook: BookWithId = {
+      const updatedBook: DeviceWithId = {
         ...book,
-        book: {
-          ...book.book,
+        device: {
+          ...book.device,
           maTb: values.maTb,
           loaiTb: values.loaiTb,
           tenTb: values.tenTb,
@@ -47,7 +48,7 @@ const EditDevice: React.FC = () => {
           dvsd: values.dvsd,
         },
       };
-      dispatch(updateBook(updatedBook)).then(() => {
+      dispatch(updateDevice(updatedBook)).then(() => {
         setLoading(false);
         toast.success("Update sussces");
         navigate("/device");
@@ -116,13 +117,13 @@ const EditDevice: React.FC = () => {
                   layout="vertical"
                   form={form}
                   initialValues={{
-                    maTb: book.book.maTb,
-                    loaiTb: book.book.loaiTb,
-                    tenTb: book.book.tenTb,
-                    tenDn: book.book.tenDn,
-                    diaChi: book.book.diaChi,
-                    matKhau: book.book.matKhau,
-                    dvsd: book.book.dvsd,
+                    maTb: book.device.maTb,
+                    loaiTb: book.device.loaiTb,
+                    tenTb: book.device.tenTb,
+                    tenDn: book.device.tenDn,
+                    diaChi: book.device.diaChi,
+                    matKhau: book.device.matKhau,
+                    dvsd: book.device.dvsd,
                   }}
                 >
                   <Row gutter={16}>
@@ -224,14 +225,14 @@ const EditDevice: React.FC = () => {
                       >
                         <Select
                           mode="multiple"
-                          value={book?.book.dvsd}
+                          value={book?.device.dvsd}
                           onChange={(value) =>
                             setBook((prevBook) => {
                               if (prevBook) {
                                 return {
                                   ...prevBook,
                                   book: {
-                                    ...prevBook.book,
+                                    ...prevBook.device,
                                     dvsd: value,
                                   },
                                 };
