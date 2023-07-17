@@ -4,29 +4,31 @@ import { Route, Routes } from "react-router-dom";
 import ForgotPassword from "./login/forgot_password";
 import ForgotPasswordNew from "./login/forgot_password_new";
 
-import AuthRoutes from "../components/deviceCompo/AuthAction";
+import AuthRoutes from "../components/AuthAction";
 
-import AddDevices from "../components/deviceCompo/AddDevices";
+import AddDevices from "../components/deviceCompo/ThemTb";
 
-import Device from "./Device/Device";
-import ReadDevice from "../components/deviceCompo/ReadDevice";
-import Service from "./services/Service";
+import ReadDevice from "../components/deviceCompo/DocTb";
+import Service from "./services/DichVu";
 
-import EditService from "./../components/serviceCompo/EditService";
-import EditDevice from "../components/deviceCompo/EditDevice";
-import AddService from "../components/serviceCompo/AddService";
+import EditService from "../components/serviceCompo/SuaDv";
+import EditDevice from "../components/deviceCompo/SuaTb";
+import AddService from "../components/serviceCompo/ThemDv";
 
-import ReadService from "../components/serviceCompo/Read";
-import Accounts from "./Accounts/Accounts";
-import AddAccounts from "../components/accountsCompo/AddAccounts";
+import ReadService from "../components/serviceCompo/DocDv";
+import Accounts from "./Accounts/TaiKhoan";
+import AddAccounts from "../components/accountsCompo/ThemTaiKhoan";
 
-import EditAccount from "./../components/accountsCompo/EditAccount";
+import EditAccount from "../components/accountsCompo/SuaTaiKhoan";
 import Profile from "./profile/Profile";
-import AddCapSo from "./../components/capso/AddCapSo";
+import AddCapSo from "../components/capso/ThemCapSo";
 import CapSo from "./QuanLiCapSo/CapSo";
-import ReadCapSo from "../components/capso/ReadCapSo";
-import Home from "./Home/Home";
+import ReadCapSo from "../components/capso/DocCapSo";
+
 import Dashboards from "./Home/Home";
+import LapBaoCao from "./baocao/LapBaoCao";
+import Device from "./Device/ThietBi";
+import NhatKyHoatDong from "./nhatkyhoatdong/NhatKyHoatDong";
 
 const Defautlayout = () => {
   return (
@@ -36,6 +38,7 @@ const Defautlayout = () => {
         <Route path="/forgotnew" element={<ForgotPasswordNew />} />
         <Route element={<AuthRoutes />}>
           <Route path="/profile" element={<Profile />} />
+
           <Route path="/home" element={<Dashboards />} />
 
           <Route path="/device" element={<Device />} />
@@ -52,6 +55,8 @@ const Defautlayout = () => {
           <Route path="/add-number" element={<AddCapSo />} />
           <Route path="/read-capso/:id" element={<ReadCapSo />} />
 
+          <Route path="/report" element={<LapBaoCao />} />
+
           <Route path="/settings/accounts" element={<Accounts />} />
           <Route
             path="/settings/accounts/add-accounts"
@@ -61,6 +66,8 @@ const Defautlayout = () => {
             path="/settings/accounts/edit-accounts/:id"
             element={<EditAccount />}
           />
+
+          <Route path="/settings/users" element={<NhatKyHoatDong />} />
         </Route>
       </Routes>
     </div>

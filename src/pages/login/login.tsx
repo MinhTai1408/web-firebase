@@ -5,13 +5,15 @@ import { Link } from "react-router-dom";
 import { AuthForm } from "../../model/from";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../Firebase";
+import { auth, db } from "../../Firebase";
 
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import { login } from "../../features/authSilce";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { LoginHistory } from "../../model/interfaces";
+import { addDoc, collection } from "firebase/firestore";
 
 const Login = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -27,6 +29,25 @@ const Login = () => {
     }
   }, [user, navigate]);
 
+  const logLoginHistory = async (email: string, action: string) => {
+    try {
+      const response = await fetch("https://api64.ipify.org?format=json");
+      const data = await response.json();
+      const ip = data.ip;
+
+      const historyData: LoginHistory = {
+        email,
+        timestamp: Date.now(),
+        ip,
+        action,
+      };
+
+      // Save the login history to Firestore
+      await addDoc(collection(db, "loginHistory"), historyData);
+    } catch (error) {
+      console.error("Error logging login history:", error);
+    }
+  };
   const handleFormSubmit = async (values: AuthForm) => {
     setErrorMessage(null);
     setLoading(true);
@@ -36,7 +57,7 @@ const Login = () => {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
 
       setLoading(false);
-      if (user && user.email)
+      if (user && user.email) {
         dispatch(
           login({
             email: user.email,
@@ -44,6 +65,8 @@ const Login = () => {
             photoUrl: user.photoURL || null,
           })
         );
+        logLoginHistory(user.email, "Login"); // Log the successful login
+      }
     } catch (error: any) {
       const errorCode = error.code;
       setErrorMessage(errorCode);

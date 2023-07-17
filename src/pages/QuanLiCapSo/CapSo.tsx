@@ -22,6 +22,7 @@ import Sider from "antd/es/layout/Sider";
 import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { addHours } from "date-fns";
 const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
 const CapSo: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -84,6 +85,29 @@ const CapSo: React.FC = () => {
     }
   }, [selected, navigate]);
 
+  const isUsed = (ngayGioCap: string, hanSuDung: string) => {
+    const currentDate = new Date();
+    const capDate = new Date(ngayGioCap);
+    const hanSuDungDate = new Date(hanSuDung);
+
+    const timeDifferenceInHours = (date1: Date, date2: Date) =>
+      Math.abs(date1.getTime() - date2.getTime()) / (1000 * 60 * 60);
+
+    const hoursAfterNgayGioCap = timeDifferenceInHours(currentDate, capDate);
+    const hoursAfterHanSuDung = timeDifferenceInHours(
+      currentDate,
+      hanSuDungDate
+    );
+
+    if (hoursAfterNgayGioCap > 5) {
+      return "Bỏ qua";
+    } else if (hoursAfterHanSuDung > 3) {
+      return "Đã sử dụng";
+    } else {
+      return "Đang chờ";
+    }
+  };
+
   const colums = [
     {
       title: "Stt",
@@ -113,10 +137,19 @@ const CapSo: React.FC = () => {
     {
       title: "Trạng thái hoạt động",
       dataIndex: "trangThai",
-
       key: "trangThai",
-      render: (text: string) => {
-        const color = text === "Hoạt động" ? "green" : "red";
+      render: (record: CapSoWithId) => {
+        const ngayGioCap = record.capSo?.ngayGioCap || "";
+        const hanSuDung = record.capSo?.hanSuDung || "";
+
+        const trangThai = isUsed(ngayGioCap, hanSuDung);
+
+        const color =
+          trangThai === "Đã sử dụng"
+            ? "black"
+            : trangThai === "Đang chờ"
+            ? "blue"
+            : "red";
 
         return (
           <>
@@ -130,7 +163,7 @@ const CapSo: React.FC = () => {
                 marginRight: 10,
               }}
             />
-            {text}
+            {trangThai}
           </>
         );
       },
@@ -152,7 +185,10 @@ const CapSo: React.FC = () => {
   ];
   const dataSource = currentData?.map((item) => ({
     ...item,
-    trangThai: Math.random() < 0.5 ? "Hoạt động" : "Ngưng hoạt động",
+    trangThai: isUsed(
+      item.capSo?.ngayGioCap || "",
+      item.capSo?.hanSuDung || ""
+    ),
   }));
   return (
     <Layout>
@@ -303,6 +339,9 @@ const CapSo: React.FC = () => {
                 columns={colums}
                 pagination={false}
                 rowKey={(record) => record.id}
+                onRow={(record) => ({
+                  onClick: () => handleReadIcon(record),
+                })}
               />
               <Pagination
                 style={{ marginTop: 16, textAlign: "end" }}

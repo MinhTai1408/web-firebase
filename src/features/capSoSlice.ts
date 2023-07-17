@@ -7,6 +7,7 @@ interface CapSo {
   tenDichVu: string;
   ngayGioCap: string;
   hanSuDung: string;
+  trangThai?: string;
 }
 export interface CapSoWithId {
   id: string;
