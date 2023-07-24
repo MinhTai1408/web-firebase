@@ -4,10 +4,14 @@ import { db } from "../Firebase";
 
 interface CapSo {
   thuTu: number;
+  tenKhachHang: string;
   tenDichVu: string;
   ngayGioCap: string;
   hanSuDung: string;
-  trangThai?: string;
+  trangThai: string;
+  nguonCap: string;
+  soDt?: string;
+  email?: string;
 }
 export interface CapSoWithId {
   id: string;

@@ -8,6 +8,10 @@ import { Content, Header } from "antd/es/layout/layout";
 import { AccountsWithId, updateAccounts } from "../../features/accountsSlice";
 import { toast } from "react-toastify";
 import { getAuth, updatePassword } from "firebase/auth";
+import axios from "axios";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../Firebase";
+import AvataProfile from "../../pages/profile/AvataProfile";
 
 interface EditAccountParams {
   id: string;
@@ -15,6 +19,7 @@ interface EditAccountParams {
 }
 
 const EditAccount: React.FC = () => {
+  const { user } = useAppSelector((state) => state.auth);
   const [size] = useState(12);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -32,7 +37,25 @@ const EditAccount: React.FC = () => {
     );
     setAccount(selecteAccounts ?? null);
   }, [accountsArray, id]);
+  const getCurrentDateTime = (): string => {
+    const currentDate = new Date();
+    return currentDate.toLocaleString();
+  };
+  const logUserAction = async (action: string) => {
+    // Fetch the user's IP address using an external API
+    const response = await axios.get("https://api.ipify.org?format=json");
+    const userIp = response.data.ip;
+    if (user) {
+      const logData = {
+        email: user.email,
+        timestamp: getCurrentDateTime(),
+        ip: userIp,
+        action,
+      };
 
+      await addDoc(collection(db, "activityLog"), logData);
+    }
+  };
   const handleUpdateAccount = async () => {
     try {
       const values = await form.validateFields(); // Validate and get the updated form values
@@ -66,6 +89,7 @@ const EditAccount: React.FC = () => {
         toast.success("Cập nhật thành công");
         navigate("/settings/accounts");
       }
+      await logUserAction(`Cập nhật tài khoản ${getCurrentDateTime()}`);
     } catch (error) {
       console.error("Error updating account:", error);
       setLoading(false);
@@ -80,26 +104,33 @@ const EditAccount: React.FC = () => {
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
-            <div
-              style={{
-                fontSize: 15,
-                textAlign: "start",
-                color: "orange",
-              }}
-            >
-              <p style={{ fontWeight: 500, color: "black" }}>
-                Cài đặt hệ thống &gt;
-                <Link
-                  to="/settings/accounts"
-                  style={{ color: "black", left: 5 }}
+            <Row>
+              <Col span={12}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    textAlign: "start",
+                    color: "orange",
+                  }}
                 >
-                  Quản lý tài khoản &gt;
-                </Link>
-                <Link to="#" style={{ color: "orange", left: 5 }}>
-                  Cập nhật tài khoản
-                </Link>
-              </p>
-            </div>
+                  <p style={{ fontWeight: 500, color: "black" }}>
+                    Cài đặt hệ thống &gt;
+                    <Link
+                      to="/settings/accounts"
+                      style={{ color: "black", left: 5 }}
+                    >
+                      Quản lý tài khoản &gt;
+                    </Link>
+                    <Link to="#" style={{ color: "orange", left: 5 }}>
+                      Cập nhật tài khoản
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+              <Col span={12}>
+                <AvataProfile />
+              </Col>
+            </Row>
           </Header>
           <Content
             style={{

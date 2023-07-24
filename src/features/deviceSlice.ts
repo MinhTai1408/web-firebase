@@ -17,6 +17,8 @@ export interface Device {
   tenDn: string;
   diaChi: string;
   matKhau: string;
+  trangThaiHd: string;
+  trangThaiKn: string;
   dvsd: string[] | string;
 }
 

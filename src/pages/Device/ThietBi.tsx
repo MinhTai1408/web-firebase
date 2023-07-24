@@ -17,14 +17,16 @@ import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { Link, useNavigate } from "react-router-dom";
-import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import "../Device/Device.css";
 import { DeviceWithId, fetchDevice } from "../../features/deviceSlice";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSquarePlus } from "@fortawesome/free-solid-svg-icons";
+import AvataProfile from "../profile/AvataProfile";
 const MAX_DISPLAY_ITEMS = 2; ////giới hạn số từ hiển thị trong cột dịch vụ sử dụng
-const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
+const PAGE_SIZE = 4; //giới hạn số lượng dữ liệu ở mỗi trang
 
 const Device: React.FC = () => {
   const renderDvsd = (text: string[] | undefined) => {
@@ -55,10 +57,18 @@ const Device: React.FC = () => {
   const navigate = useNavigate();
   const [selectedBook, setSelectedBook] = useState<DeviceWithId | null>(null);
   const [selected, setSelected] = useState<DeviceWithId | null>(null);
-
-  const filteredData = data?.filter((book) =>
-    book.device?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [selectedHd, setSelectedHd] = useState<string | null>(null);
+  const [selectedKn, setselectedKn] = useState<string | null>(null);
+  const filteredData = data
+    ?.filter((book) =>
+      book.device?.tenTb?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((book) =>
+      selectedHd ? book.device?.trangThaiHd === selectedHd : true
+    )
+    .filter((book) =>
+      selectedKn ? book.device?.trangThaiKn === selectedKn : true
+    );
 
   //hiển thị bảng dữ liệu
   useEffect(() => {
@@ -100,6 +110,30 @@ const Device: React.FC = () => {
     }
   }, [selected, navigate]);
 
+  const getColorForTrangThaiHd = (trangThai: string | undefined) => {
+    switch (trangThai) {
+      case "Ngưng hoạt động":
+        return "red"; // Chấm màu xanh lá cây
+      case "Hoạt động":
+        return "green"; // Chấm màu xanh nước biển
+
+      default:
+        return "gray"; // Mặc định là chấm màu xám (nếu không có trạng thái hợp lệ)
+    }
+  };
+
+  const getColorForTrangThaiKn = (trangThai: string | undefined) => {
+    switch (trangThai) {
+      case "Mất kết nối":
+        return "red"; // Chấm màu xanh lá cây
+      case "Kết nối":
+        return "green"; // Chấm màu xanh nước biển
+
+      default:
+        return "gray"; // Mặc định là chấm màu xám (nếu không có trạng thái hợp lệ)
+    }
+  };
+
   //các cột trong bảng
   const columns = [
     {
@@ -122,54 +156,44 @@ const Device: React.FC = () => {
     },
     {
       title: "Trạng thái hoạt động",
-      dataIndex: "trangThai",
-      width: 150,
-      key: "trangThai",
-      render: (text: string) => {
-        const color = text === "Hoạt động" ? "green" : "red";
-
-        return (
-          <>
-            <div
-              style={{
-                backgroundColor: color,
-                borderRadius: "50%",
-                display: "inline-block",
-                width: 10,
-                height: 10,
-                marginRight: 10,
-              }}
-            />
-            {text}
-          </>
-        );
-      },
+      dataIndex: ["device", "trangThaiHd"],
+      key: "trangThaiHd",
+      width: 170,
+      render: (trangThai: string | undefined) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              backgroundColor: getColorForTrangThaiHd(trangThai),
+              marginRight: 8,
+            }}
+          />
+          {trangThai}
+        </div>
+      ),
     },
     {
       title: "Trạng thái kết nối",
-      dataIndex: "trangThaiKn",
+      dataIndex: ["device", "trangThaiKn"],
       width: 150,
 
-      key: "trangThaikn",
-      render: (text: string) => {
-        const color = text === "Kết nối" ? "green" : "red";
-
-        return (
-          <>
-            <div
-              style={{
-                backgroundColor: color,
-                borderRadius: "50%",
-                display: "inline-block",
-                width: 10,
-                height: 10,
-                marginRight: 10,
-              }}
-            />
-            {text}
-          </>
-        );
-      },
+      key: "trangThaiKn",
+      render: (trangThai: string | undefined) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              backgroundColor: getColorForTrangThaiKn(trangThai),
+              marginRight: 8,
+            }}
+          />
+          {trangThai}
+        </div>
+      ),
     },
     {
       title: "Dịch vụ sử dụng",
@@ -183,7 +207,12 @@ const Device: React.FC = () => {
       width: 50,
       render: (record: DeviceWithId) => (
         <>
-          <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
+          <a
+            style={{ textDecoration: "underline" }}
+            onClick={() => handleReadIcon(record)}
+          >
+            Đọc
+          </a>
         </>
       ),
     },
@@ -192,16 +221,17 @@ const Device: React.FC = () => {
       width: 50,
       render: (record: DeviceWithId) => (
         <>
-          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
+          <a
+            style={{ textDecoration: "underline" }}
+            onClick={() => handleEditIcon(record)}
+          >
+            Cập nhật
+          </a>
         </>
       ),
     },
   ];
-  const dataSource = currentData?.map((item) => ({
-    ...item,
-    trangThai: Math.random() < 0.5 ? "Hoạt động" : "Ngưng hoạt động",
-    trangThaiKn: Math.random() < 0.5 ? "Kết nối" : "Mất kết nối",
-  }));
+
   return (
     <Layout>
       <Sider>
@@ -209,20 +239,27 @@ const Device: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: "#f5f5f5" }}>
-          <div
-            style={{
-              fontSize: 15,
-              textAlign: "start",
-              color: "orange",
-            }}
-          >
-            <p style={{ fontWeight: 500, color: "black" }}>
-              Thiết bị &gt;
-              <Link to="/device" style={{ color: "orange", right: 5 }}>
-                Danh sách thiết bị
-              </Link>
-            </p>
-          </div>
+          <Row>
+            <Col span={8}>
+              <div
+                style={{
+                  fontSize: 15,
+                  textAlign: "start",
+                  color: "orange",
+                }}
+              >
+                <p style={{ fontWeight: 500, color: "black" }}>
+                  Thiết bị &gt;
+                  <Link to="/device" style={{ color: "orange", right: 5 }}>
+                    Danh sách thiết bị
+                  </Link>
+                </p>
+              </div>
+            </Col>
+            <Col span={16}>
+              <AvataProfile />
+            </Col>
+          </Row>
         </Header>
         <Content style={{ margin: "24px 16px 0" }}>
           <p
@@ -254,18 +291,19 @@ const Device: React.FC = () => {
                 }
                 options={[
                   {
-                    value: "1",
+                    value: null,
                     label: "Tất cả",
                   },
                   {
-                    value: "2",
-                    label: "Hoạt động",
-                  },
-                  {
-                    value: "3",
+                    value: "Ngưng hoạt động",
                     label: "Ngưng hoạt động",
                   },
+                  {
+                    value: "Hoạt động",
+                    label: "Hoạt động",
+                  },
                 ]}
+                onChange={(value) => setSelectedHd(value)}
               />
             </Col>
             <Col span={8}>
@@ -286,18 +324,19 @@ const Device: React.FC = () => {
                 }
                 options={[
                   {
-                    value: "1",
+                    value: null,
                     label: "Tất cả",
                   },
                   {
-                    value: "2",
+                    value: "Kết nối",
                     label: "Kết nối",
                   },
                   {
-                    value: "3",
+                    value: "Mất kết nối",
                     label: "Mất kết nối",
                   },
                 ]}
+                onChange={(value) => setselectedKn(value)}
               />
             </Col>
             <Col span={7}>
@@ -312,7 +351,7 @@ const Device: React.FC = () => {
           <Row style={{ paddingTop: 20 }}>
             <Col span={22}>
               <Table
-                dataSource={dataSource}
+                dataSource={currentData}
                 columns={columns}
                 pagination={false}
                 rowKey={(record) => record.id}
@@ -328,16 +367,16 @@ const Device: React.FC = () => {
             <Col span={2} style={{ left: 10 }}>
               <Card style={{ width: 70, backgroundColor: "#ffc069" }}>
                 <Link to={"/add-device"}>
-                  <Button
+                  <FontAwesomeIcon
+                    icon={faSquarePlus}
                     style={{
-                      right: 10,
-                      fontSize: 15,
-                      backgroundColor: "#fa8c16",
+                      fontSize: 30,
+                      borderRadius: "30%",
+                      color: "#fa8c16",
+                      padding: "5px",
                     }}
-                  >
-                    <EditOutlined />
-                  </Button>
-                  <p>Thêm thiết bị</p>
+                  />
+                  <a>Thêm thiết bị</a>
                 </Link>
               </Card>
             </Col>

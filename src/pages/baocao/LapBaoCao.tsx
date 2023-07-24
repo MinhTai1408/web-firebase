@@ -23,8 +23,9 @@ import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import Card from "antd/es/card/Card";
 import { FileExcelOutlined } from "@ant-design/icons";
+import AvataProfile from "../profile/AvataProfile";
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 4;
 
 const LapBaoCao: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -65,94 +66,57 @@ const LapBaoCao: React.FC = () => {
   );
   const totalPageCount = Math.ceil((filteredData?.length ?? 0) / PAGE_SIZE);
 
-  const isUsed = (ngayGioCap: string, hanSuDung: string) => {
-    const currentDate = new Date();
-    const capDate = new Date(ngayGioCap);
-    const hanSuDungDate = new Date(hanSuDung);
-
-    const timeDifferenceInHours = (date1: Date, date2: Date) =>
-      Math.abs(date1.getTime() - date2.getTime()) / (1000 * 60 * 60);
-
-    const hoursAfterNgayGioCap = timeDifferenceInHours(currentDate, capDate);
-    const hoursAfterHanSuDung = timeDifferenceInHours(
-      currentDate,
-      hanSuDungDate
-    );
-
-    if (hoursAfterNgayGioCap > 5) {
-      return "Bỏ qua";
-    } else if (hoursAfterHanSuDung > 3) {
-      return "Đã sử dụng";
-    } else {
-      return "Đang chờ";
+  const getColorForTrangThai = (trangThai: string | undefined) => {
+    switch (trangThai) {
+      case "Đã sử dụng":
+        return "green"; // Chấm màu xanh lá cây
+      case "Đang chờ":
+        return "blue"; // Chấm màu xanh nước biển
+      case "Bỏ qua":
+        return "red"; // Chấm màu đỏ
+      default:
+        return "gray"; // Mặc định là chấm màu xám (nếu không có trạng thái hợp lệ)
     }
   };
-
-  // Prepare the dataSource for the table
-  const dataSource = currentData?.map((item) => ({
-    key: item.id, // Add a unique key for each item
-    stt: item.capSo?.thuTu,
-    tenDichVu: item.capSo?.tenDichVu,
-    ngayGioCap: item.capSo?.ngayGioCap,
-    trangThai: isUsed(
-      item.capSo?.ngayGioCap || "",
-      item.capSo?.hanSuDung || ""
-    ),
-  }));
-
   const columns = [
     {
       title: "Stt",
-      dataIndex: "stt",
+      dataIndex: ["capSo", "thuTu"],
       key: "stt",
     },
+
     {
       title: "Tên dịch vụ",
-      dataIndex: "tenDichVu",
+      dataIndex: ["capSo", "tenDichVu"],
       key: "tenDichVu",
     },
     {
-      title: "Thời gian cấp",
-      dataIndex: "ngayGioCap",
+      title: "Ngày giờ cấp",
+      dataIndex: ["capSo", "ngayGioCap"],
       key: "ngayGioCap",
     },
     {
-      title: "Tình trạng",
-      dataIndex: "trangThai",
+      title: "Trạng thái hoạt động",
+      dataIndex: ["capSo", "trangThai"],
       key: "trangThai",
-      render: (record: CapSoWithId) => {
-        const ngayGioCap = record.capSo?.ngayGioCap || "";
-        const hanSuDung = record.capSo?.hanSuDung || "";
-
-        const trangThai = isUsed(ngayGioCap, hanSuDung);
-
-        const color =
-          trangThai === "Đã sử dụng"
-            ? "black"
-            : trangThai === "Đang chờ"
-            ? "blue"
-            : "red";
-
-        return (
-          <>
-            <div
-              style={{
-                backgroundColor: color,
-                borderRadius: "50%",
-                display: "inline-block",
-                width: 10,
-                height: 10,
-                marginRight: 10,
-              }}
-            />
-            {trangThai}
-          </>
-        );
-      },
+      render: (trangThai: string | undefined) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              backgroundColor: getColorForTrangThai(trangThai),
+              marginRight: 8,
+            }}
+          />
+          {trangThai}
+        </div>
+      ),
     },
     {
       title: "Nguồn cấp",
-      dataIndex: "nguonCap",
+      dataIndex: ["capSo", "nguonCap"],
       key: "nguonCap",
     },
   ];
@@ -162,10 +126,8 @@ const LapBaoCao: React.FC = () => {
       Stt: item.capSo?.thuTu,
       "Tên dịch vụ": item.capSo?.tenDichVu,
       "Thời gian cấp": item.capSo?.ngayGioCap,
-      "Tình trạng": isUsed(
-        item.capSo?.ngayGioCap || "",
-        item.capSo?.hanSuDung || ""
-      ),
+      "Tình trạng": item.capSo?.trangThai,
+      "Nguồn cấp": item.capSo?.nguonCap,
     }));
 
     // Convert the data to a worksheet
@@ -195,20 +157,27 @@ const LapBaoCao: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: "#f5f5f5" }}>
-          <div
-            style={{
-              fontSize: 15,
-              textAlign: "start",
-              color: "orange",
-            }}
-          >
-            <p style={{ fontWeight: 500, color: "black" }}>
-              Báo cáo &gt;
-              <Link to="#" style={{ color: "orange", right: 5 }}>
-                Lập báo cáo
-              </Link>
-            </p>
-          </div>
+          <Row>
+            <Col span={8}>
+              <div
+                style={{
+                  fontSize: 15,
+                  textAlign: "start",
+                  color: "orange",
+                }}
+              >
+                <p style={{ fontWeight: 500, color: "black" }}>
+                  Báo cáo &gt;
+                  <Link to="#" style={{ color: "orange", right: 5 }}>
+                    Lập báo cáo
+                  </Link>
+                </p>
+              </div>
+            </Col>
+            <Col span={16}>
+              <AvataProfile />
+            </Col>
+          </Row>
         </Header>
         <Content style={{ margin: "24px 16px 0" }}>
           <Row>
@@ -226,7 +195,7 @@ const LapBaoCao: React.FC = () => {
           <Row style={{ paddingTop: 20 }}>
             <Col span={22}>
               <Table
-                dataSource={dataSource}
+                dataSource={currentData}
                 columns={columns}
                 pagination={false}
                 rowKey="key" // Use the unique key specified in dataSource

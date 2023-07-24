@@ -15,6 +15,7 @@ export interface Service {
   maDvCap: string;
   tenDv: string;
   moTa: string;
+  trangThai: string;
 }
 export interface ServiceWithId {
   id: string;

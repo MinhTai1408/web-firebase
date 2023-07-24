@@ -10,6 +10,10 @@ import { Content, Header } from "antd/es/layout/layout";
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import Menu from "../../pages/Menu/Menu";
 import { DeviceWithId, updateDevice } from "../../features/deviceSlice";
+import axios from "axios";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../Firebase";
+import AvataProfile from "../../pages/profile/AvataProfile";
 
 interface EditParams {
   [key: string]: string | undefined;
@@ -17,6 +21,7 @@ interface EditParams {
 }
 
 const EditDevice: React.FC = () => {
+  const { user } = useAppSelector((state) => state.auth);
   const { id } = useParams<EditParams>();
   const [form] = Form.useForm();
   const [book, setBook] = useState<DeviceWithId | null>(null);
@@ -31,8 +36,26 @@ const EditDevice: React.FC = () => {
     const selectedBook = deviceArray?.find((book) => book.id === id);
     setBook(selectedBook ?? null);
   }, [deviceArray, id]);
+  const getCurrentDateTime = (): string => {
+    const currentDate = new Date();
+    return currentDate.toLocaleString();
+  };
+  const logUserAction = async (action: string) => {
+    // Fetch the user's IP address using an external API
+    const response = await axios.get("https://api.ipify.org?format=json");
+    const userIp = response.data.ip;
+    if (user) {
+      const logData = {
+        email: user.email,
+        timestamp: getCurrentDateTime(),
+        ip: userIp,
+        action,
+      };
 
-  const handleUpdate = () => {
+      await addDoc(collection(db, "activityLog"), logData);
+    }
+  };
+  const handleUpdate = async () => {
     const values = form.getFieldsValue();
     if (book) {
       const updatedBook: DeviceWithId = {
@@ -53,6 +76,7 @@ const EditDevice: React.FC = () => {
         toast.success("Update sussces");
         navigate("/device");
       });
+      await logUserAction(`Cập nhất thiết bị ${getCurrentDateTime()}`);
     }
   };
   const [size] = useState(12);
@@ -64,23 +88,30 @@ const EditDevice: React.FC = () => {
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
-            <div
-              style={{
-                fontSize: 15,
-                textAlign: "start",
-                color: "orange",
-              }}
-            >
-              <p style={{ fontWeight: 500, color: "black" }}>
-                Thiết bị &gt;
-                <Link to="/device" style={{ color: "black", left: 5 }}>
-                  Danh sách thiết bị &gt;
-                </Link>
-                <Link to="#" style={{ color: "orange", left: 5 }}>
-                  Cập nhật thiết bị
-                </Link>
-              </p>
-            </div>
+            <Row>
+              <Col span={9}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    textAlign: "start",
+                    color: "orange",
+                  }}
+                >
+                  <p style={{ fontWeight: 500, color: "black" }}>
+                    Thiết bị &gt;
+                    <Link to="/device" style={{ color: "black" }}>
+                      Danh sách thiết bị &gt;
+                    </Link>
+                    <Link to="#" style={{ color: "orange" }}>
+                      Cập nhật thiết bị
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+              <Col span={15}>
+                <AvataProfile />
+              </Col>
+            </Row>
           </Header>
           <Content
             style={{

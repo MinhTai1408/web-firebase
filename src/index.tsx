@@ -8,7 +8,12 @@ import { BrowserRouter } from "react-router-dom";
 import { store } from "./store/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { fab } from "@fortawesome/free-brands-svg-icons";
+import { far } from "@fortawesome/free-regular-svg-icons";
 
+library.add(fas, fab, far);
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

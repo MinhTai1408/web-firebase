@@ -17,8 +17,12 @@ import {
 import Sider from "antd/es/layout/Sider";
 import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
-import { EditOutlined, SearchOutlined } from "@ant-design/icons";
-const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
+import { SearchOutlined } from "@ant-design/icons";
+import { faSquarePlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import NotificationPopover from "../profile/Notifications";
+import AvataProfile from "../profile/AvataProfile";
+const PAGE_SIZE = 4; //giới hạn số lượng dữ liệu ở mỗi trang
 const Accounts: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,7 +43,6 @@ const Accounts: React.FC = () => {
       selectedStatus ? service.accounts?.trangThai === selectedStatus : true
     );
 
-  //hiển thị bảng dữ liệu
   useEffect(() => {
     dispatch(fetchAccounts());
   }, [dispatch]);
@@ -123,7 +126,12 @@ const Accounts: React.FC = () => {
       width: 50,
       render: (record: AccountsWithId) => (
         <>
-          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
+          <a
+            style={{ textDecoration: "underline" }}
+            onClick={() => handleEditIcon(record)}
+          >
+            Cập nhật
+          </a>
         </>
       ),
     },
@@ -140,21 +148,28 @@ const Accounts: React.FC = () => {
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
-            <div
-              style={{
-                fontSize: 15,
-                textAlign: "start",
-                color: "orange",
-                left: 5,
-              }}
-            >
-              <p style={{ fontWeight: 500, color: "black" }}>
-                Cài đặt hệ thống &gt;
-                <Link to="#" style={{ color: "orange", right: 5 }}>
-                  Quản lý tài khoản
-                </Link>
-              </p>
-            </div>
+            <Row>
+              <Col span={8}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    textAlign: "start",
+                    color: "orange",
+                    left: 5,
+                  }}
+                >
+                  <p style={{ fontWeight: 500, color: "black" }}>
+                    Cài đặt hệ thống &gt;
+                    <Link to="#" style={{ color: "orange", right: 5 }}>
+                      Quản lý tài khoản
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+              <Col span={16}>
+                <AvataProfile />
+              </Col>
+            </Row>
           </Header>
           <Content style={{ margin: "24px 16px 0" }}>
             <p
@@ -227,18 +242,21 @@ const Accounts: React.FC = () => {
                 />
               </Col>
               <Col span={2} style={{ left: 10 }}>
-                <Card style={{ width: 70, backgroundColor: "#ffc069" }}>
+                <Card
+                  style={{ width: 70, height: 130, backgroundColor: "#ffc069" }}
+                >
                   <Link to={"/settings/accounts/add-accounts"}>
-                    <Button
+                    <FontAwesomeIcon
+                      icon={faSquarePlus}
                       style={{
-                        right: 10,
-                        fontSize: 15,
-                        backgroundColor: "#fa8c16",
+                        fontSize: 30,
+                        borderRadius: "30%",
+                        color: "#fa8c16",
+                        padding: "5px",
                       }}
-                    >
-                      <EditOutlined />
-                    </Button>
-                    <p>Thêm tài khoản</p>
+                    />
+
+                    <a>Thêm tài khoản</a>
                   </Link>
                 </Card>
               </Col>

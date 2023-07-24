@@ -67,7 +67,7 @@ const SETTINGS_ITEM: MenuItem = {
     {
       key: "6.3",
       icon: <SettingOutlined />,
-      label: "Quản lý người dùng",
+      label: "Nhật ký sử dụng",
       path: "/settings/users",
     },
   ],
@@ -88,9 +88,9 @@ interface SlideProps {
 
 const Slide: FC<SlideProps> = ({ handleLogout }) => {
   return (
-    <Layout style={{ minHeight: "130vh" }}>
-      <Sider theme="light" className="sidebar">
-        <Menu mode="vertical" theme="light" className="custom-menu">
+    <Layout style={{ minHeight: "150vh" }}>
+      <Sider theme="light">
+        <Menu mode="vertical" theme="light">
           <Image
             width={200}
             src={`${process.env.PUBLIC_URL}/asset/logo-menu.png`}
@@ -116,14 +116,14 @@ const Slide: FC<SlideProps> = ({ handleLogout }) => {
             )
           )}
         </Menu>
-
-        <Button
-          onClick={handleLogout}
-          className="btn-logout"
-          icon={<LoginOutlined style={{ color: "#ff7506" }} />}
-        >
-          <span className="btn-text__logout">Đăng xuất</span>
-        </Button>
+        <div style={{ paddingTop: 190, marginLeft: 30 }}>
+          <Button
+            onClick={handleLogout}
+            icon={<LoginOutlined style={{ color: "#ff7506" }} />}
+          >
+            <span className="btn-text__logout">Đăng xuất</span>
+          </Button>
+        </div>
       </Sider>
     </Layout>
   );

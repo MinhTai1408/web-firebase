@@ -21,9 +21,12 @@ import {
 import Sider from "antd/es/layout/Sider";
 import Menu from "../Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
-import { EditOutlined, SearchOutlined } from "@ant-design/icons";
-import { addHours } from "date-fns";
-const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
+import { SearchOutlined } from "@ant-design/icons";
+import { faSquarePlus } from "@fortawesome/free-solid-svg-icons";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import AvataProfile from "../profile/AvataProfile";
+const PAGE_SIZE = 4; //giới hạn số lượng dữ liệu ở mỗi trang
 const CapSo: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -31,7 +34,10 @@ const CapSo: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [selected, setSelected] = useState<CapSoWithId | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedHd, setSelectedHd] = useState<string | null>(null);
+  const [selectedNc, setSelectedNc] = useState<string | null>(null);
 
   const dataCapSo: CapSoWithId[] | undefined = useAppSelector(
     (state) => state.capso.capSoList
@@ -49,10 +55,16 @@ const CapSo: React.FC = () => {
     ?.filter((capSo) =>
       capSo.capSo?.tenDichVu?.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .filter((capSo) =>
-      selectedStatus ? capSo.capSo?.tenDichVu === selectedStatus : true
-    );
 
+    .filter((capSo) =>
+      selectedService ? capSo.capSo?.tenDichVu === selectedService : true
+    )
+    .filter((capSo) =>
+      selectedHd ? capSo.capSo?.trangThai === selectedHd : true
+    )
+    .filter((capSo) =>
+      selectedNc ? capSo.capSo?.nguonCap === selectedNc : true
+    );
   //tìm kiếm
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -85,29 +97,18 @@ const CapSo: React.FC = () => {
     }
   }, [selected, navigate]);
 
-  const isUsed = (ngayGioCap: string, hanSuDung: string) => {
-    const currentDate = new Date();
-    const capDate = new Date(ngayGioCap);
-    const hanSuDungDate = new Date(hanSuDung);
-
-    const timeDifferenceInHours = (date1: Date, date2: Date) =>
-      Math.abs(date1.getTime() - date2.getTime()) / (1000 * 60 * 60);
-
-    const hoursAfterNgayGioCap = timeDifferenceInHours(currentDate, capDate);
-    const hoursAfterHanSuDung = timeDifferenceInHours(
-      currentDate,
-      hanSuDungDate
-    );
-
-    if (hoursAfterNgayGioCap > 5) {
-      return "Bỏ qua";
-    } else if (hoursAfterHanSuDung > 3) {
-      return "Đã sử dụng";
-    } else {
-      return "Đang chờ";
+  const getColorForTrangThai = (trangThai: string | undefined) => {
+    switch (trangThai) {
+      case "Đã sử dụng":
+        return "green"; // Chấm màu xanh lá cây
+      case "Đang chờ":
+        return "blue"; // Chấm màu xanh nước biển
+      case "Bỏ qua":
+        return "red"; // Chấm màu đỏ
+      default:
+        return "gray"; // Mặc định là chấm màu xám (nếu không có trạng thái hợp lệ)
     }
   };
-
   const colums = [
     {
       title: "Stt",
@@ -116,7 +117,7 @@ const CapSo: React.FC = () => {
     },
     {
       title: "Tên khách hàng",
-      dataIndex: "tenKhachHang",
+      dataIndex: ["capSo", "tenKhachHang"],
       key: "tenKhachHang",
     },
     {
@@ -136,41 +137,26 @@ const CapSo: React.FC = () => {
     },
     {
       title: "Trạng thái hoạt động",
-      dataIndex: "trangThai",
+      dataIndex: ["capSo", "trangThai"],
       key: "trangThai",
-      render: (record: CapSoWithId) => {
-        const ngayGioCap = record.capSo?.ngayGioCap || "";
-        const hanSuDung = record.capSo?.hanSuDung || "";
-
-        const trangThai = isUsed(ngayGioCap, hanSuDung);
-
-        const color =
-          trangThai === "Đã sử dụng"
-            ? "black"
-            : trangThai === "Đang chờ"
-            ? "blue"
-            : "red";
-
-        return (
-          <>
-            <div
-              style={{
-                backgroundColor: color,
-                borderRadius: "50%",
-                display: "inline-block",
-                width: 10,
-                height: 10,
-                marginRight: 10,
-              }}
-            />
-            {trangThai}
-          </>
-        );
-      },
+      render: (trangThai: string | undefined) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              backgroundColor: getColorForTrangThai(trangThai),
+              marginRight: 8,
+            }}
+          />
+          {trangThai}
+        </div>
+      ),
     },
     {
       title: "Nguồn cấp",
-      dataIndex: "nguonCap",
+      dataIndex: ["capSo", "nguonCap"],
       key: "nguonCap",
     },
     {
@@ -178,18 +164,17 @@ const CapSo: React.FC = () => {
       width: 50,
       render: (record: CapSoWithId) => (
         <>
-          <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
+          <a
+            onClick={() => handleReadIcon(record)}
+            style={{ textDecoration: "underline" }}
+          >
+            Đọc
+          </a>
         </>
       ),
     },
   ];
-  const dataSource = currentData?.map((item) => ({
-    ...item,
-    trangThai: isUsed(
-      item.capSo?.ngayGioCap || "",
-      item.capSo?.hanSuDung || ""
-    ),
-  }));
+
   return (
     <Layout>
       <Sider>
@@ -197,20 +182,28 @@ const CapSo: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: "#f5f5f5" }}>
-          <div
-            style={{
-              fontSize: 15,
-              textAlign: "start",
-              color: "orange",
-            }}
-          >
-            <p style={{ fontWeight: 500, color: "black" }}>
-              Cấp số &gt;
-              <Link to="#" style={{ color: "orange", right: 5 }}>
-                Danh sách cấp số
-              </Link>
-            </p>
-          </div>
+          <Row>
+            <Col span={8}>
+              <div
+                style={{
+                  fontSize: 15,
+                  textAlign: "start",
+                  color: "orange",
+                }}
+              >
+                <p style={{ fontWeight: 500, color: "black" }}>
+                  Cấp số &gt;
+                  <Link to="#" style={{ color: "orange", right: 5 }}>
+                    Danh sách cấp số
+                  </Link>
+                </p>
+              </div>
+            </Col>
+
+            <Col span={16}>
+              <AvataProfile />
+            </Col>
+          </Row>
         </Header>
         <Content style={{ margin: "24px 16px 0" }}>
           <p
@@ -224,8 +217,44 @@ const CapSo: React.FC = () => {
             Quản lý cấp số
           </p>
           <Row>
-            <Col span={3}>
+            <Col span={5}>
               <Form.Item label="Tên dịch vụ" />
+              <Select
+                showSearch
+                placeholder="Tất cả"
+                style={{ width: 150 }}
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.label ?? "").includes(input)
+                }
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? "")
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? "").toLowerCase())
+                }
+                options={[
+                  {
+                    value: null,
+                    label: "Tất cả",
+                  },
+                  {
+                    value: "Khám sản - Phụ khoa",
+                    label: "Khám sản - Phụ khoa",
+                  },
+                  {
+                    value: "Khám răng hàm mặt",
+                    label: "Khám răng hàm mặt",
+                  },
+                  {
+                    value: "Khám răng tim mạch",
+                    label: "Khám răng tim mạch",
+                  },
+                ]}
+                onChange={(value) => setSelectedService(value)}
+              />
+            </Col>
+            <Col span={3}>
+              <Form.Item label="Hoạt động " />
               <Select
                 showSearch
                 placeholder="Tất cả"
@@ -244,19 +273,23 @@ const CapSo: React.FC = () => {
                     label: "Tất cả",
                   },
                   {
-                    value: "dichVu1",
-                    label: "dichVu1",
+                    value: "Đang chờ",
+                    label: "Đang chờ ",
                   },
                   {
-                    value: "dichVu2",
-                    label: "dichVu2",
+                    value: "Bỏ qua",
+                    label: "Bỏ qua",
+                  },
+                  {
+                    value: "Đã sử dụng",
+                    label: "Đã sử dụng",
                   },
                 ]}
-                onChange={(value) => setSelectedStatus(value)}
+                onChange={(value) => setSelectedHd(value)}
               />
             </Col>
             <Col span={3}>
-              <Form.Item label="Tình trạng " />
+              <Form.Item label="Nguồn cấp " />
               <Select
                 showSearch
                 placeholder="Tất cả"
@@ -271,51 +304,22 @@ const CapSo: React.FC = () => {
                 }
                 options={[
                   {
-                    value: "1",
+                    value: null,
                     label: "Tất cả",
                   },
                   {
-                    value: "2",
-                    label: "Kết nối",
+                    value: "Kiosk",
+                    label: "Kiosk",
                   },
                   {
-                    value: "3",
-                    label: "Mất kết nối",
+                    value: "Hệ thống",
+                    label: "Hệ thống",
                   },
                 ]}
+                onChange={(value) => setSelectedNc(value)}
               />
             </Col>
-            <Col span={3}>
-              <Form.Item label="Tình trạng " />
-              <Select
-                showSearch
-                placeholder="Tất cả"
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  (option?.label ?? "").includes(input)
-                }
-                filterSort={(optionA, optionB) =>
-                  (optionA?.label ?? "")
-                    .toLowerCase()
-                    .localeCompare((optionB?.label ?? "").toLowerCase())
-                }
-                options={[
-                  {
-                    value: "1",
-                    label: "Tất cả",
-                  },
-                  {
-                    value: "2",
-                    label: "Kết nối",
-                  },
-                  {
-                    value: "3",
-                    label: "Mất kết nối",
-                  },
-                ]}
-              />
-            </Col>
-            <Col span={10}>
+            <Col span={9}>
               <Form.Item label="Chọn thời gian " />
               <Space direction="vertical">
                 <DatePicker onChange={onChange} />
@@ -335,7 +339,7 @@ const CapSo: React.FC = () => {
             </Col>
             <Col span={22} style={{ paddingTop: 20 }}>
               <Table
-                dataSource={dataSource}
+                dataSource={currentData}
                 columns={colums}
                 pagination={false}
                 rowKey={(record) => record.id}
@@ -355,21 +359,21 @@ const CapSo: React.FC = () => {
               <Card
                 style={{
                   width: 70,
-
+                  height: 110,
                   backgroundColor: "#ffc069",
                 }}
               >
                 <Link to={"/add-number"}>
-                  <Button
+                  <FontAwesomeIcon
+                    icon={faSquarePlus}
                     style={{
-                      right: 10,
-                      fontSize: 15,
-                      backgroundColor: "#fa8c16",
+                      fontSize: 30,
+                      borderRadius: "30%",
+                      color: "#fa8c16",
+                      padding: "5px",
                     }}
-                  >
-                    <EditOutlined />
-                  </Button>
-                  <p>Cấp số</p>
+                  />
+                  <a>Cấp số</a>
                 </Link>
               </Card>
             </Col>

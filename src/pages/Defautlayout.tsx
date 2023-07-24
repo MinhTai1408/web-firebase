@@ -29,6 +29,9 @@ import Dashboards from "./Home/Home";
 import LapBaoCao from "./baocao/LapBaoCao";
 import Device from "./Device/ThietBi";
 import NhatKyHoatDong from "./nhatkyhoatdong/NhatKyHoatDong";
+import QuanlyVaitro from "./quanlyvaitro/QuanlyVaitro";
+import ThemVaiTro from "../components/vaitro/ThemVaiTro";
+import SuaVaiTro from "../components/vaitro/SuaVaiTro";
 
 const Defautlayout = () => {
   return (
@@ -36,6 +39,7 @@ const Defautlayout = () => {
       <Routes>
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/forgotnew" element={<ForgotPasswordNew />} />
+
         <Route element={<AuthRoutes />}>
           <Route path="/profile" element={<Profile />} />
 
@@ -56,6 +60,13 @@ const Defautlayout = () => {
           <Route path="/read-capso/:id" element={<ReadCapSo />} />
 
           <Route path="/report" element={<LapBaoCao />} />
+
+          <Route path="/settings/roles" element={<QuanlyVaitro />} />
+          <Route path="/settings/roles/add-roles" element={<ThemVaiTro />} />
+          <Route
+            path="/settings/roles/edit-roles/:id"
+            element={<SuaVaiTro />}
+          />
 
           <Route path="/settings/accounts" element={<Accounts />} />
           <Route

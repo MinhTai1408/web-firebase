@@ -17,18 +17,20 @@ import {
   Space,
   Table,
 } from "antd";
-import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import { ServiceWithId, fetchService } from "../../features/serviceSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
-
-const PAGE_SIZE = 2; //giới hạn số lượng dữ liệu ở mỗi trang
+import { faSquarePlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import AvataProfile from "../profile/AvataProfile";
+const PAGE_SIZE = 4; //giới hạn số lượng dữ liệu ở mỗi trang
 
 const Service: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selected, setSelected] = useState<ServiceWithId | null>(null);
   const [selectedup, setSelectedup] = useState<ServiceWithId | null>(null);
-
+  const [selectedHd, setSelectedHd] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -50,9 +52,13 @@ const Service: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const filteredData = data?.filter((service) =>
-    service.service?.tenDv?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = data
+    ?.filter((service) =>
+      service.service?.tenDv?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((service) =>
+      selectedHd ? service.service?.trangThai === selectedHd : true
+    );
 
   //phân trang
   const currentData = filteredData?.slice(
@@ -81,6 +87,17 @@ const Service: React.FC = () => {
       navigate(`/edit-service/${selectedup.id}`);
     }
   }, [selectedup, navigate]);
+  const getColorForTrangThai = (trangThai: string | undefined) => {
+    switch (trangThai) {
+      case "Ngưng hoạt động":
+        return "red"; // Chấm màu xanh lá cây
+      case "Hoạt động":
+        return "green"; // Chấm màu xanh nước biển
+
+      default:
+        return "gray"; // Mặc định là chấm màu xám (nếu không có trạng thái hợp lệ)
+    }
+  };
 
   const columns = [
     {
@@ -100,34 +117,34 @@ const Service: React.FC = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "trangThai",
+      dataIndex: ["service", "trangThai"],
       key: "trangThai",
-      render: (text: string) => {
-        const color = text === "Hoạt động" ? "green" : "red";
-
-        return (
-          <>
-            <div
-              style={{
-                backgroundColor: color,
-                borderRadius: "50%",
-                display: "inline-block",
-                width: 10,
-                height: 10,
-                marginRight: 10,
-              }}
-            />
-            {text}
-          </>
-        );
-      },
+      render: (trangThai: string | undefined) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              backgroundColor: getColorForTrangThai(trangThai),
+              marginRight: 8,
+            }}
+          />
+          {trangThai}
+        </div>
+      ),
     },
     {
       key: "action",
       width: 50,
       render: (record: ServiceWithId) => (
         <>
-          <Button onClick={() => handleReadIcon(record)}>Đọc</Button>
+          <a
+            style={{ textDecoration: "underline" }}
+            onClick={() => handleReadIcon(record)}
+          >
+            Đọc
+          </a>
         </>
       ),
     },
@@ -136,16 +153,16 @@ const Service: React.FC = () => {
       width: 50,
       render: (record: ServiceWithId) => (
         <>
-          <Button onClick={() => handleEditIcon(record)}>Cập nhật</Button>
+          <a
+            style={{ textDecoration: "underline" }}
+            onClick={() => handleEditIcon(record)}
+          >
+            Cập nhật
+          </a>
         </>
       ),
     },
   ];
-
-  const dataSource = currentData?.map((item) => ({
-    ...item,
-    trangThai: Math.random() < 0.5 ? "Hoạt động" : "Ngưng hoạt động",
-  }));
 
   return (
     <div>
@@ -155,21 +172,28 @@ const Service: React.FC = () => {
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
-            <div
-              style={{
-                fontSize: 15,
-                textAlign: "start",
-                color: "orange",
-                left: 5,
-              }}
-            >
-              <p style={{ fontWeight: 500, color: "black" }}>
-                Dịch vụ &gt;
-                <Link to="/service" style={{ color: "orange", right: 5 }}>
-                  Danh sách dịch vụ
-                </Link>
-              </p>
-            </div>
+            <Row>
+              <Col span={8}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    textAlign: "start",
+                    color: "orange",
+                    left: 5,
+                  }}
+                >
+                  <p style={{ fontWeight: 500, color: "black" }}>
+                    Dịch vụ &gt;
+                    <Link to="/service" style={{ color: "orange", right: 5 }}>
+                      Danh sách dịch vụ
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+              <Col span={16}>
+                <AvataProfile />
+              </Col>
+            </Row>
           </Header>
           <Content style={{ margin: "24px 16px 0" }}>
             <p
@@ -200,18 +224,19 @@ const Service: React.FC = () => {
                   }
                   options={[
                     {
-                      value: "1",
+                      value: null,
                       label: "Tất cả",
                     },
                     {
-                      value: "2",
+                      value: "Hoạt động",
                       label: "Hoạt động",
                     },
                     {
-                      value: "3",
+                      value: "Ngưng hoạt động",
                       label: "Ngưng hoạt động",
                     },
                   ]}
+                  onChange={(value) => setSelectedHd(value)}
                 />
               </Col>
               <Col span={9}>
@@ -236,7 +261,7 @@ const Service: React.FC = () => {
             <Row style={{ paddingTop: 20 }}>
               <Col span={22}>
                 <Table
-                  dataSource={dataSource}
+                  dataSource={currentData}
                   columns={columns}
                   pagination={false}
                   rowKey={(record) => record.id}
@@ -250,18 +275,20 @@ const Service: React.FC = () => {
                 />
               </Col>
               <Col span={2} style={{ left: 10 }}>
-                <Card style={{ width: 70, backgroundColor: "#ffc069" }}>
+                <Card
+                  style={{ width: 70, height: 130, backgroundColor: "#ffc069" }}
+                >
                   <Link to={"/add-service"}>
-                    <Button
+                    <FontAwesomeIcon
+                      icon={faSquarePlus}
                       style={{
-                        right: 10,
-                        fontSize: 15,
-                        backgroundColor: "#fa8c16",
+                        fontSize: 30,
+                        borderRadius: "30%",
+                        color: "#fa8c16",
+                        padding: "5px",
                       }}
-                    >
-                      <EditOutlined />
-                    </Button>
-                    <p>Thêm dịch vụ</p>
+                    />
+                    <a>Thêm dịch vụ</a>
                   </Link>
                 </Card>
               </Col>

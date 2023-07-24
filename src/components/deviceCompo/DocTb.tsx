@@ -7,6 +7,7 @@ import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import { DeviceWithId } from "../../features/deviceSlice";
+import AvataProfile from "../../pages/profile/AvataProfile";
 
 interface RouteParams {
   [key: string]: string | undefined;
@@ -33,23 +34,30 @@ const ReadDevice: React.FC = () => {
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
-            <div
-              style={{
-                fontSize: 15,
-                textAlign: "start",
-                color: "orange",
-              }}
-            >
-              <p style={{ fontWeight: 500, color: "black" }}>
-                Thiết bị &gt;
-                <Link to="/device" style={{ color: "black", left: 5 }}>
-                  Danh sách thiết bị &gt;
-                </Link>
-                <Link to="#" style={{ color: "orange", left: 5 }}>
-                  Chi tiết thiết bị
-                </Link>
-              </p>
-            </div>
+            <Row>
+              <Col span={9}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    textAlign: "start",
+                    color: "orange",
+                  }}
+                >
+                  <p style={{ fontWeight: 500, color: "black" }}>
+                    Thiết bị &gt;
+                    <Link to="/device" style={{ color: "black" }}>
+                      Danh sách thiết bị &gt;
+                    </Link>
+                    <Link to="#" style={{ color: "orange" }}>
+                      Chi tiết thiết bị
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+              <Col span={15}>
+                <AvataProfile />
+              </Col>
+            </Row>
           </Header>
           <Content
             style={{

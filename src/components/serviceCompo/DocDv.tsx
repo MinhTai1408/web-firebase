@@ -19,12 +19,11 @@ import {
 import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
-import {
-  EditOutlined,
-  RollbackOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-
+import { RollbackOutlined, SearchOutlined } from "@ant-design/icons";
+import Meta from "antd/es/card/Meta";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
+import AvataProfile from "../../pages/profile/AvataProfile";
 interface RouteParams {
   [key: string]: string | undefined;
   id: string;
@@ -35,9 +34,10 @@ const ReadService: React.FC = () => {
   const [sortedData, setSortedData] = useState<ServiceWithId[]>([]);
   const [service, setService] = useState<ServiceWithId | null>(null);
   const [searchText, setSearchText] = useState<string>("");
+  const [selectedHd, setSelectedHd] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 2,
+    pageSize: 4,
   });
 
   const serviceArray: ServiceWithId[] | undefined = useAppSelector(
@@ -56,6 +56,18 @@ const ReadService: React.FC = () => {
     );
     setSortedData(sortedArray);
   }, [serviceArray, id]);
+  const getColorForTrangThai = (trangThai: string | undefined) => {
+    switch (trangThai) {
+      case "Ngưng hoạt động":
+        return "red"; // Chấm màu xanh lá cây
+      case "Hoạt động":
+        return "green"; // Chấm màu xanh nước biển
+
+      default:
+        return "gray"; // Mặc định là chấm màu xám (nếu không có trạng thái hợp lệ)
+    }
+  };
+
   const columns = [
     {
       title: "Mã dịch vụ cấp",
@@ -64,33 +76,32 @@ const ReadService: React.FC = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "trangThai",
+      dataIndex: ["service", "trangThai"],
       key: "trangThai",
-      render: (text: string) => {
-        const color = text === "Đã hoàn thành" ? "green" : "yellow";
-
-        return (
-          <>
-            <div
-              style={{
-                backgroundColor: color,
-                borderRadius: "50%",
-                display: "inline-block",
-                width: 10,
-                height: 10,
-                marginRight: 10,
-              }}
-            />
-            {text}
-          </>
-        );
-      },
+      render: (trangThai: string | undefined) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              backgroundColor: getColorForTrangThai(trangThai),
+              marginRight: 8,
+            }}
+          />
+          {trangThai}
+        </div>
+      ),
     },
   ];
 
-  const filteredData = sortedData.filter((item) =>
-    item.service.maDvCap.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredData = sortedData
+    .filter((item) =>
+      item.service.maDvCap.toLowerCase().includes(searchText.toLowerCase())
+    )
+    .filter((item) =>
+      selectedHd ? item.service?.trangThai === selectedHd : true
+    );
   const totalItems = filteredData?.length ?? 0;
   const startIndex = (pagination.current - 1) * pagination.pageSize;
   const endIndex = startIndex + pagination.pageSize;
@@ -112,23 +123,30 @@ const ReadService: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: "#f5f5f5" }}>
-          <div
-            style={{
-              fontSize: 15,
-              textAlign: "start",
-              color: "orange",
-            }}
-          >
-            <p style={{ fontWeight: 500, color: "black" }}>
-              Dịch vụ &gt;
-              <Link to="/service" style={{ color: "black", left: 5 }}>
-                Danh sách dịch vụ &gt;
-              </Link>
-              <Link to="#" style={{ color: "orange", left: 5 }}>
-                Chi tiết
-              </Link>
-            </p>
-          </div>
+          <Row>
+            <Col span={8}>
+              <div
+                style={{
+                  fontSize: 15,
+                  textAlign: "start",
+                  color: "orange",
+                }}
+              >
+                <p style={{ fontWeight: 500, color: "black" }}>
+                  Dịch vụ &gt;
+                  <Link to="/service" style={{ color: "black", left: 5 }}>
+                    Danh sách dịch vụ &gt;
+                  </Link>
+                  <Link to="#" style={{ color: "orange", left: 5 }}>
+                    Chi tiết
+                  </Link>
+                </p>
+              </div>
+            </Col>
+            <Col span={16}>
+              <AvataProfile />
+            </Col>
+          </Row>
         </Header>
         <Content
           style={{
@@ -196,18 +214,19 @@ const ReadService: React.FC = () => {
                             }
                             options={[
                               {
-                                value: "1",
+                                value: null,
                                 label: "Tất cả",
                               },
                               {
-                                value: "2",
+                                value: "Hoạt động",
                                 label: "Hoạt động",
                               },
                               {
-                                value: "3",
+                                value: "Ngưng hoạt động",
                                 label: "Ngưng hoạt động",
                               },
                             ]}
+                            onChange={(value) => setSelectedHd(value)}
                           />
                         </Col>
                         <Col span={11} style={{ marginLeft: 25 }}>
@@ -252,19 +271,24 @@ const ReadService: React.FC = () => {
             </Col>
             <Col span={2}>
               <Card
-                style={{ width: 70, height: 120, backgroundColor: "#ffc069" }}
+                style={{ width: 70, height: 90, backgroundColor: "#ffc069" }}
               >
                 <Link to={`/edit-service/${id}`}>
-                  <Button
-                    style={{
-                      right: 10,
-                      fontSize: 15,
-                      backgroundColor: "#fa8c16",
-                    }}
-                  >
-                    <EditOutlined />
-                  </Button>
-                  <p>Cập nhật </p>
+                  <Meta
+                    avatar={
+                      <FontAwesomeIcon
+                        icon={faPen}
+                        style={{
+                          fontSize: 15,
+                          borderRadius: "30%",
+                          background: "#fa8c16",
+                          color: "white",
+                          padding: "5px",
+                        }}
+                      />
+                    }
+                  />
+                  <a>Cập nhật </a>
                 </Link>
               </Card>
               <Card
@@ -281,7 +305,7 @@ const ReadService: React.FC = () => {
                   >
                     <RollbackOutlined />
                   </Button>
-                  <p>Quay lại </p>
+                  <a>Quay lại </a>
                 </Link>
               </Card>
             </Col>

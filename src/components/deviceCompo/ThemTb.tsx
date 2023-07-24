@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Select, Layout, Row, Col, Space } from "antd";
-import { useAppDispatch } from "../../hooks/storeHook";
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  Layout,
+  Row,
+  Col,
+  Space,
+  Checkbox,
+} from "antd";
+import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 
 import { toast } from "react-toastify";
 import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import { addDeviceToFirestore } from "../../features/deviceSlice";
+import axios from "axios";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../Firebase";
+import AvataProfile from "../../pages/profile/AvataProfile";
 
 type DeviceData = {
   maTb: string;
@@ -20,6 +34,7 @@ type DeviceData = {
 };
 
 const AddDevice: React.FC = () => {
+  const { user } = useAppSelector((state) => state.auth);
   const [size] = useState(12);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -34,7 +49,42 @@ const AddDevice: React.FC = () => {
   });
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const getCurrentDateTime = (): string => {
+    const currentDate = new Date();
+    return currentDate.toLocaleString();
+  };
+  const logUserAction = async (action: string) => {
+    // Fetch the user's IP address using an external API
+    const response = await axios.get("https://api.ipify.org?format=json");
+    const userIp = response.data.ip;
+    if (user) {
+      const logData = {
+        email: user.email,
+        timestamp: getCurrentDateTime(),
+        ip: userIp,
+        action,
+      };
 
+      await addDoc(collection(db, "activityLog"), logData);
+    }
+  };
+  const randomHd = () => {
+    const randomValues = Math.random();
+    if (randomValues < 1 / 2) {
+      return "Hoạt động";
+    } else {
+      return "Ngưng hoạt động";
+    }
+  };
+
+  const randomKn = () => {
+    const randomValue = Math.random();
+    if (randomValue < 1 / 2) {
+      return "Mất kết nối";
+    } else {
+      return "Kết nối";
+    }
+  };
   const handleAddBook = async () => {
     try {
       const values = await form.validateFields();
@@ -46,6 +96,8 @@ const AddDevice: React.FC = () => {
         tenDn: values.tenDn,
         diaChi: values.diaChi,
         matKhau: values.matKhau,
+        trangThaiHd: randomHd(),
+        trangThaiKn: randomKn(),
         dvsd: deviceData.dvsd,
       };
       dispatch(addDeviceToFirestore(book)).then(() => {
@@ -53,6 +105,7 @@ const AddDevice: React.FC = () => {
         toast.success("Add success");
         navigate("/device");
       });
+      await logUserAction(`Thêm thiết bị ${getCurrentDateTime()}`);
     } catch (error) {
       console.log("Validation failed:", error);
     }
@@ -84,23 +137,30 @@ const AddDevice: React.FC = () => {
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
-            <div
-              style={{
-                fontSize: 15,
-                textAlign: "start",
-                color: "orange",
-              }}
-            >
-              <p style={{ fontWeight: 500, color: "black" }}>
-                Thiết bị &gt;
-                <Link to="/device" style={{ color: "black", left: 5 }}>
-                  Danh sách thiết bị &gt;
-                </Link>
-                <Link to="#" style={{ color: "orange", left: 5 }}>
-                  Thêm thiết bị
-                </Link>
-              </p>
-            </div>
+            <Row>
+              <Col span={8}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    textAlign: "start",
+                    color: "orange",
+                  }}
+                >
+                  <p style={{ fontWeight: 500, color: "black" }}>
+                    Thiết bị &gt;
+                    <Link to="/device" style={{ color: "black", left: 5 }}>
+                      Danh sách thiết bị &gt;
+                    </Link>
+                    <Link to="#" style={{ color: "orange", left: 5 }}>
+                      Thêm thiết bị
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+              <Col span={16}>
+                <AvataProfile />
+              </Col>
+            </Row>
           </Header>
           <Content
             style={{

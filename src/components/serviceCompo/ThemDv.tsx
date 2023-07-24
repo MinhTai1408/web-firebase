@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAppDispatch } from "../../hooks/storeHook";
+import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import { Link, useNavigate } from "react-router-dom";
 import { Service, addServiceToFirestore } from "../../features/serviceSlice";
 import { toast } from "react-toastify";
@@ -19,9 +19,13 @@ import Menu from "../../pages/Menu/Menu";
 import { Content, Header } from "antd/es/layout/layout";
 import TextArea from "antd/es/input/TextArea";
 import { CheckboxValueType } from "antd/es/checkbox/Group";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { addDoc, collection, getDocs, getFirestore } from "firebase/firestore";
+import axios from "axios";
+import { db } from "../../Firebase";
+import AvataProfile from "../../pages/profile/AvataProfile";
 
 const AddService: React.FC = () => {
+  const { user } = useAppSelector((state) => state.auth);
   const [form] = Form.useForm();
   const [size] = useState(12);
   const [loading, setLoading] = useState(false);
@@ -54,6 +58,35 @@ const AddService: React.FC = () => {
   let previousMaDv = "";
   let surfixMaDv = "";
   let counter = 1;
+
+  const getCurrentDateTime = (): string => {
+    const currentDate = new Date();
+    return currentDate.toLocaleString();
+  };
+  const logUserAction = async (action: string) => {
+    // Fetch the user's IP address using an external API
+    const response = await axios.get("https://api.ipify.org?format=json");
+    const userIp = response.data.ip;
+    if (user) {
+      const logData = {
+        email: user.email,
+        timestamp: getCurrentDateTime(),
+        ip: userIp,
+        action,
+      };
+
+      await addDoc(collection(db, "activityLog"), logData);
+    }
+  };
+
+  const randomState = () => {
+    const randomValue = Math.random();
+    if (randomValue < 1 / 2) {
+      return "Hoạt động";
+    } else {
+      return "Ngưng hoạt động";
+    }
+  };
 
   const handleAddService = async () => {
     try {
@@ -124,6 +157,7 @@ const AddService: React.FC = () => {
         maDvCap: newMaDvCap,
         tenDv: values.tenDv,
         moTa: values.moTa,
+        trangThai: randomState(),
       };
 
       dispatch(addServiceToFirestore(service)).then(() => {
@@ -134,6 +168,7 @@ const AddService: React.FC = () => {
 
       // Save the current maDv for the next submission
       previousMaDv = values.maDv;
+      await logUserAction(`Thêm dịch vụ ${getCurrentDateTime()}`);
     } catch (error) {
       console.log("Validation failed:", error);
     }
@@ -147,23 +182,30 @@ const AddService: React.FC = () => {
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
-            <div
-              style={{
-                fontSize: 15,
-                textAlign: "start",
-                color: "orange",
-              }}
-            >
-              <p style={{ fontWeight: 500, color: "black" }}>
-                Dịch vụ &gt;
-                <Link to="/service" style={{ color: "black", left: 5 }}>
-                  Danh sách dịch vụ &gt;
-                </Link>
-                <Link to="#" style={{ color: "orange", left: 5 }}>
-                  Thêm dịch vụ
-                </Link>
-              </p>
-            </div>
+            <Row>
+              <Col span={8}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    textAlign: "start",
+                    color: "orange",
+                  }}
+                >
+                  <p style={{ fontWeight: 500, color: "black" }}>
+                    Dịch vụ &gt;
+                    <Link to="/service" style={{ color: "black", left: 5 }}>
+                      Danh sách dịch vụ &gt;
+                    </Link>
+                    <Link to="#" style={{ color: "orange", left: 5 }}>
+                      Thêm dịch vụ
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+              <Col span={16}>
+                <AvataProfile />
+              </Col>
+            </Row>
           </Header>
           <Content
             style={{
