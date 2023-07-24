@@ -11,16 +11,20 @@ const ForgotPasswordNew = () => {
             width={170}
             height={136}
             src={`${process.env.PUBLIC_URL}/asset/logo.png`}
-            className=""
+            style={{ marginLeft: 150 }}
           />
           <Form
             form={form}
             layout="vertical"
-            style={{ paddingTop: 70, bottom: 20, marginLeft: "30px" }}
+            style={{
+              paddingTop: 50,
+              bottom: 20,
+              marginLeft: 30,
+              marginRight: 20,
+              textAlign: "center",
+            }}
           >
-            <label
-              style={{ fontSize: 20, fontWeight: 600, textAlign: "center" }}
-            >
+            <label style={{ fontSize: 20, fontWeight: 600 }}>
               Đặt lại mật khẩu
             </label>
             <Form.Item label="Mật khẩu" name="password">
@@ -31,13 +35,13 @@ const ForgotPasswordNew = () => {
             </Form.Item>
           </Form>
 
-          <Form.Item style={{ paddingTop: 20 }}>
+          <Form.Item style={{ paddingTop: 20, textAlign: "center" }}>
             <Button style={{ backgroundColor: "#FF9138", color: "white" }}>
               <Link to="/">Xác nhận</Link>
             </Button>
           </Form.Item>
         </Col>
-        <Col flex={3}>
+        <Col flex={0}>
           <Image
             width={700}
             height={590}

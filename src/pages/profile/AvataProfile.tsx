@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Layout, Row, Col } from "antd";
+import { Form, Row, Col } from "antd";
 
 import { useAppDispatch, useAppSelector } from "../../hooks/storeHook";
 import { useNavigate } from "react-router-dom";
@@ -7,15 +7,11 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../../Firebase";
 import { collection, doc } from "firebase/firestore";
-import { faBell } from "@fortawesome/free-solid-svg-icons";
-import Sider from "antd/es/layout/Sider";
-import Menu from "../Menu/Menu";
-import { CameraOutlined, UserOutlined } from "@ant-design/icons";
+
+import { UserOutlined } from "@ant-design/icons";
 import { AccountsWithId, Acounts } from "../../features/accountsSlice";
 import Avatar from "antd/es/avatar/avatar";
-import { Content, Header } from "antd/es/layout/layout";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Meta from "antd/es/card/Meta";
+
 import NotificationPopover from "./Notifications";
 
 const AvataProfile: React.FC = () => {
@@ -101,45 +97,43 @@ const AvataProfile: React.FC = () => {
     setShowUploadForm(true);
   };
   return (
-    <Layout>
-      <Layout>
-        <Header style={{ backgroundColor: "#f5f5f5" }}>
+    <div>
+      <Row style={{ backgroundColor: "#f5f5f5" }}>
+        <Col span={16}>
           <Row>
-            <Col span={16}>
-              <Row>
-                <Col span={2} style={{ left: 240, paddingTop: 5 }}>
-                  <NotificationPopover />
-                </Col>
-                <Col span={2}>
-                  <Avatar
-                    size={40}
-                    icon={<UserOutlined />}
-                    src={avatarURL}
-                    style={{
-                      borderRadius: "80%",
-                      backgroundColor: "orange",
+            <Col span={2} style={{ left: 240, paddingTop: 5 }}>
+              <NotificationPopover />
+            </Col>
+            <Col span={2}>
+              <Avatar
+                size={40}
+                icon={<UserOutlined />}
+                src={avatarURL}
+                style={{
+                  borderRadius: "80%",
+                  backgroundColor: "orange",
 
-                      left: 260,
-                    }}
-                  />
-                </Col>
-                <Col span={10} style={{ left: 290 }}>
-                  <Form layout="vertical">
-                    <Form.Item label="xin chào">
-                      {accountData && (
-                        <>
-                          <a>{accountData.accounts.hoTen}</a>
-                        </>
-                      )}
-                    </Form.Item>
-                  </Form>
-                </Col>
-              </Row>
+                  left: 260,
+                }}
+              />
+            </Col>
+            <Col span={10} style={{ left: 290 }}>
+              <Form layout="vertical">
+                <Form.Item label="xin chào">
+                  {accountData && (
+                    <>
+                      <a style={{ color: "black" }}>
+                        {accountData.accounts.hoTen}
+                      </a>
+                    </>
+                  )}
+                </Form.Item>
+              </Form>
             </Col>
           </Row>
-        </Header>
-      </Layout>
-    </Layout>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

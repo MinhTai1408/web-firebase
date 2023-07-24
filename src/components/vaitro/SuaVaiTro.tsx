@@ -189,7 +189,7 @@ const SuaVaiTro = () => {
                     </Col>
                     <Col span={12}>
                       <Form.Item label="Phân quyền chức năng">
-                        <Card style={{ backgroundColor: "orange" }}>
+                        <Card style={{ backgroundColor: "#FFC89B" }}>
                           <Form.Item
                             label="Nhóm chức năng A"
                             name="phanQuyenChucNangA"

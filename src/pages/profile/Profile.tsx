@@ -131,7 +131,11 @@ const Profile = () => {
                 <Col span={8} style={{ left: 290 }}>
                   <Form layout="vertical">
                     <Form.Item label="xin chào">
-                      {accountData && <>{accountData.accounts.hoTen}</>}
+                      {accountData && (
+                        <a style={{ color: "black" }}>
+                          {accountData.accounts.hoTen}
+                        </a>
+                      )}
                     </Form.Item>
                   </Form>
                 </Col>

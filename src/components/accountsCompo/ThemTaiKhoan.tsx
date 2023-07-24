@@ -299,11 +299,11 @@ const AddAccounts: React.FC = () => {
               }}
             >
               <Space size={size}>
-                <Button style={{ backgroundColor: " white", color: "#FF9138" }}>
-                  <Link to="/device">Hủy</Link>
+                <Button style={{ background: " #FFF2E7", color: "#FF9138" }}>
+                  <Link to="/device">Hủy bỏ</Link>
                 </Button>
                 <Button
-                  type="primary"
+                  style={{ background: "#FF9138", color: "white" }}
                   onClick={handleAddAccount}
                   loading={loading}
                 >

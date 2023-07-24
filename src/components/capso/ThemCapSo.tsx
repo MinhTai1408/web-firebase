@@ -6,12 +6,14 @@ import { formatToTimeZone } from "date-fns-timezone";
 import { Button, Form, Layout, Modal, Select, Space, Row, Col } from "antd";
 import Sider from "antd/es/layout/Sider";
 import Menu from "../../pages/Menu/Menu";
-import { Content, Header } from "antd/es/layout/layout";
+import { Content, Footer, Header } from "antd/es/layout/layout";
 import { Link } from "react-router-dom";
 
 import { useAppSelector } from "../../hooks/storeHook";
 import axios from "axios";
 import AvataProfile from "../../pages/profile/AvataProfile";
+import Card from "antd/es/card/Card";
+import Meta from "antd/es/card/Meta";
 
 const AddCapSo = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -255,10 +257,23 @@ const AddCapSo = () => {
 
             {modalOpen && (
               <Modal open={modalOpen} onCancel={handleModalClose}>
-                <h3>Số thứ tự: {capSo.thuTu}</h3>
-                <p>Dịch vụ: {capSo.tenDichVu}</p>
-                <p>Ngày giờ cấp: {capSo.ngayGioCap}</p>
-                <p>Giờ hạn sử dụng: {capSo.hanSuDung}</p>
+                <Layout style={{ width: 450, backgroundColor: "white" }}>
+                  <Content style={{ textAlign: "center" }}>
+                    <h3>Số thứ tự được cấp</h3>
+                    <p
+                      style={{ color: "orange", fontSize: 45, fontWeight: 700 }}
+                    >
+                      {capSo.thuTu}
+                    </p>
+                    <p>Dịch vụ: {capSo.tenDichVu}</p>
+                  </Content>
+                  <Footer style={{ background: "#fa8c16" }}>
+                    <div className="card-footer bg-transparent border-success">
+                      <p>Ngày giờ cấp: {capSo.ngayGioCap}</p>
+                      <p>Giờ hạn sử dụng: {capSo.hanSuDung}</p>
+                    </div>
+                  </Footer>
+                </Layout>
               </Modal>
             )}
           </Content>

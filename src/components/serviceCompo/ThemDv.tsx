@@ -340,11 +340,13 @@ const AddService: React.FC = () => {
               }}
             >
               <Space size={size}>
-                <Button style={{ backgroundColor: " white", color: "#FF9138" }}>
+                <Button
+                  style={{ backgroundColor: "  #FFF2E7", color: "#FF9138" }}
+                >
                   <Link to="/service">Hủy bỏ</Link>
                 </Button>
                 <Button
-                  type="primary"
+                  style={{ background: "#FF9138", color: "white" }}
                   onClick={handleAddService}
                   loading={loading}
                 >

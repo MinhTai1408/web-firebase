@@ -138,7 +138,7 @@ const AddDevice: React.FC = () => {
         <Layout>
           <Header style={{ backgroundColor: "#f5f5f5" }}>
             <Row>
-              <Col span={8}>
+              <Col span={11}>
                 <div
                   style={{
                     fontSize: 15,
@@ -157,7 +157,7 @@ const AddDevice: React.FC = () => {
                   </p>
                 </div>
               </Col>
-              <Col span={16}>
+              <Col span={13}>
                 <AvataProfile />
               </Col>
             </Row>
@@ -326,11 +326,13 @@ const AddDevice: React.FC = () => {
               }}
             >
               <Space size={size}>
-                <Button style={{ backgroundColor: " white", color: "#FF9138" }}>
-                  <Link to="/device">Hủy</Link>
+                <Button
+                  style={{ backgroundColor: " #FFF2E7", color: "#FF9138" }}
+                >
+                  <Link to="/device">Hủy bỏ</Link>
                 </Button>
                 <Button
-                  type="primary"
+                  style={{ background: "#FF9138", color: "white" }}
                   onClick={handleAddBook}
                   loading={loading}
                 >

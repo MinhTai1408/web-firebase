@@ -164,7 +164,7 @@ const ThemVaiTro: React.FC = () => {
                   </Col>
                   <Col span={12}>
                     <Form.Item label="Phân quyền chức năng">
-                      <Card style={{ backgroundColor: "orange" }}>
+                      <Card style={{ backgroundColor: "#FFC89B" }}>
                         <Form.Item
                           label="Nhóm chức năng A"
                           name="phanQuyenChucNangA"
@@ -233,13 +233,13 @@ const ThemVaiTro: React.FC = () => {
               }}
             >
               <Space size={size}>
-                <Button style={{ backgroundColor: " white", color: "#FF9138" }}>
+                <Button style={{ background: " #FFF2E7", color: "#FF9138" }}>
                   <Link to="/settings/roles">Hủy bỏ</Link>
                 </Button>
                 <Button
-                  type="primary"
                   onClick={handleAddVaiTro}
                   loading={loading}
+                  style={{ background: "#FF9138", color: "white" }}
                 >
                   Thêm
                 </Button>

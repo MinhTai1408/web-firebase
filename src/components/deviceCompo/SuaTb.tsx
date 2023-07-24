@@ -307,10 +307,16 @@ const EditDevice: React.FC = () => {
               }}
             >
               <Space size={size}>
-                <Button style={{ backgroundColor: " white", color: "#FF9138" }}>
-                  <Link to="/device">Hủy</Link>
+                <Button
+                  style={{ backgroundColor: "  #FFF2E7", color: "#FF9138" }}
+                >
+                  <Link to="/device">Hủy bỏ</Link>
                 </Button>
-                <Button type="primary" onClick={handleUpdate} loading={loading}>
+                <Button
+                  style={{ background: "#FF9138", color: "white" }}
+                  onClick={handleUpdate}
+                  loading={loading}
+                >
                   Cập nhật
                 </Button>
               </Space>

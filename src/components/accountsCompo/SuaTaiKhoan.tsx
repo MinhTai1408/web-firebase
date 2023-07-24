@@ -316,11 +316,13 @@ const EditAccount: React.FC = () => {
               }}
             >
               <Space size={size}>
-                <Button style={{ backgroundColor: " white", color: "#FF9138" }}>
-                  Hủy
+                <Button
+                  style={{ backgroundColor: " #FFF2E7", color: "#FF9138" }}
+                >
+                  Hủy bỏ
                 </Button>
                 <Button
-                  type="primary"
+                  style={{ background: "#FF9138", color: "white" }}
                   onClick={handleUpdateAccount}
                   loading={loading}
                 >

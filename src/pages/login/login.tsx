@@ -78,7 +78,7 @@ const Login = () => {
           await updateDoc(existingLog.ref, {
             timestamp: getCurrentDateTime(),
             ip: userIp,
-            action: `Button click action - ${getCurrentDateTime()}`,
+            action: `Đã đăng nhập - ${getCurrentDateTime()}`,
           });
         } else {
           // If no log exists, create a new log
@@ -104,72 +104,71 @@ const Login = () => {
         <Layout>
           <Row>
             <Col flex={2}>
-              {" "}
               <Image
                 width={170}
                 height={136}
                 src={`${process.env.PUBLIC_URL}/asset/logo.png`}
-                className=""
+                style={{ marginLeft: 150 }}
               />
-              <div className="auth-container">
-                <div className="auth-form-container">
-                  {errorMessage && (
-                    <p className="error-message">{errorMessage}</p>
-                  )}
-                  <Form onFinish={handleFormSubmit} className="auth-form">
-                    <Form.Item
-                      name="email"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your email",
-                        },
-                        {
-                          type: "email",
-                          message: "Please enter a valid email",
-                        },
-                      ]}
-                    >
-                      <Input
-                        prefix={<UserOutlined />}
-                        placeholder="Email"
-                        className="auth-input"
-                      />
-                    </Form.Item>
 
-                    <Form.Item
-                      name="password"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your password",
-                        },
-                      ]}
-                    >
-                      <Input.Password
-                        prefix={<LockOutlined />}
-                        placeholder="Password"
-                        className="auth-input"
-                      />
-                    </Form.Item>
-                    <Link to="/forgot" style={{ marginRight: 220 }}>
-                      Quên mật khẩu ?
-                    </Link>
-                    <Form.Item>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        className="auth-button"
-                        loading={loading}
-                      >
-                        Login
-                      </Button>
-                    </Form.Item>
-                  </Form>
-                </div>
-              </div>
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
+              <Form
+                onFinish={handleFormSubmit}
+                style={{ marginLeft: 50, marginRight: 50 }}
+                layout="vertical"
+              >
+                <Form.Item
+                  label="Tên đăng nhập"
+                  name="email"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter your email",
+                    },
+                    {
+                      type: "email",
+                      message: "Please enter a valid email",
+                    },
+                  ]}
+                >
+                  <Input prefix={<UserOutlined />} placeholder="Email" />
+                </Form.Item>
+
+                <Form.Item
+                  label="Mật khẩu"
+                  name="password"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter your password",
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    prefix={<LockOutlined />}
+                    placeholder="Password"
+                  />
+                </Form.Item>
+                <Link to="/forgot" style={{ color: "red" }}>
+                  Quên mật khẩu ?
+                </Link>
+                <Form.Item
+                  style={{
+                    paddingTop: 25,
+                    textAlign: "center",
+                  }}
+                >
+                  <Button
+                    htmlType="submit"
+                    loading={loading}
+                    style={{ background: "#fa8c16", color: "white" }}
+                  >
+                    Đăng nhập
+                  </Button>
+                </Form.Item>
+              </Form>
             </Col>
-            <Col flex={3}>
+            <Col flex={0}>
               <Image
                 width={700}
                 height={590}
