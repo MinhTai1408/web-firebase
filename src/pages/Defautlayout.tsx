@@ -25,13 +25,13 @@ import AddCapSo from "../components/capso/ThemCapSo";
 import CapSo from "./QuanLiCapSo/CapSo";
 import ReadCapSo from "../components/capso/DocCapSo";
 
-import Dashboards from "./Home/Home";
 import LapBaoCao from "./baocao/LapBaoCao";
 import Device from "./Device/ThietBi";
 import NhatKyHoatDong from "./nhatkyhoatdong/NhatKyHoatDong";
 import QuanlyVaitro from "./quanlyvaitro/QuanlyVaitro";
 import ThemVaiTro from "../components/vaitro/ThemVaiTro";
 import SuaVaiTro from "../components/vaitro/SuaVaiTro";
+import Dashboard from "./Home/home";
 
 const Defautlayout = () => {
   return (
@@ -43,7 +43,7 @@ const Defautlayout = () => {
         <Route element={<AuthRoutes />}>
           <Route path="/profile" element={<Profile />} />
 
-          <Route path="/home" element={<Dashboards />} />
+          <Route path="/home" element={<Dashboard />} />
 
           <Route path="/device" element={<Device />} />
           <Route path="/add-device" element={<AddDevices />} />
@@ -71,7 +71,7 @@ const Defautlayout = () => {
           <Route path="/settings/accounts" element={<Accounts />} />
           <Route
             path="/settings/accounts/add-accounts"
-            element={<AddAccounts />}
+            element={<AddAccounts />} 
           />
           <Route
             path="/settings/accounts/edit-accounts/:id"

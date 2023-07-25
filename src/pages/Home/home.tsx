@@ -326,7 +326,7 @@ const Dashboard: React.FC = () => {
               </p>
               <Row gutter={16}>
                 <Col span={6}>
-                  <Card bordered={false} style={{ height: 177 }}>
+                  <Card bordered={false} >
                     <Meta
                       avatar={
                         <svg
@@ -429,7 +429,7 @@ const Dashboard: React.FC = () => {
                   </Card>
                 </Col>
                 <Col span={6}>
-                  <Card bordered={false} style={{ height: 177 }}>
+                  <Card bordered={false} >
                     <Meta
                       avatar={
                         <svg
@@ -479,7 +479,7 @@ const Dashboard: React.FC = () => {
                   </Card>
                 </Col>
                 <Col span={6}>
-                  <Card bordered={false} style={{ height: 177 }}>
+                  <Card bordered={false} >
                     <Meta
                       avatar={
                         <svg
@@ -524,7 +524,7 @@ const Dashboard: React.FC = () => {
                 </Col>
               </Row>
 
-              <Card style={{ top: 35 }}>
+              <Card style={{ top: 20 }}>
                 <Row>
                   <Col span={16}>
                     <h2>Bảng thông kê theo {chartHeading}</h2>
